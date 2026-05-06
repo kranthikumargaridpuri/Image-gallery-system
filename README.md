@@ -1,3 +1,4 @@
+
 # Image Gallery System - Production Ready Full Stack Project
 
 ## Includes
@@ -67,3 +68,7 @@ Before deployment:
 - GET `/api/cart`
 - POST `/api/cart/{imageId}`
 - DELETE `/api/cart/{imageId}`
+=======
+# Image-gallery-system
+Image Based Project First Version 6-5-2026
+
