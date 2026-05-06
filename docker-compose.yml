@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8
+    container_name: image_gallery_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: image_gallery
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  backend:
+    build: ./backend
+    container_name: image_gallery_backend
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/image_gallery?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      JWT_SECRET: ChangeThisSecretInProduction
+      CORS_ORIGINS: http://localhost:4200,http://localhost
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    volumes:
+      - uploads:/app/uploads
+volumes:
+  mysql_data:
+  uploads:

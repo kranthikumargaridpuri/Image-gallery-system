@@ -1,0 +1,18 @@
+# Java
+target/
+*.class
+
+# Angular
+node_modules/
+dist/
+.angular/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Uploads
+uploads/

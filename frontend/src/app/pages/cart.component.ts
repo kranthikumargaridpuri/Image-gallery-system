@@ -1,0 +1,29 @@
+import { Component, OnInit } from "@angular/core";
+import { ApiService } from "../services/api.service";
+@Component({
+  template: `<h3>My Cart</h3>
+    <div class="row">
+      <div class="col-md-4 mb-3" *ngFor="let item of items">
+        <div class="card p-3">
+          <img class="gallery-img" [src]="api.imageUrl(item.image.imageUrl)" />
+          <h5>{{ item.image.name }}</h5>
+          <button class="btn btn-danger" (click)="remove(item.image.id)">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>`,
+})
+export class CartComponent implements OnInit {
+  items: any[] = [];
+  constructor(public api: ApiService) {}
+  ngOnInit() {
+    this.load();
+  }
+  load() {
+    this.api.cart().subscribe((r) => (this.items = r));
+  }
+  remove(id) {
+    this.api.removeCart(id).subscribe(() => this.load());
+  }
+}

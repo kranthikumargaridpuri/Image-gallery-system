@@ -1,0 +1,44 @@
+import { Component } from "@angular/core";
+import { Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
+@Component({
+  template: `<div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card p-4">
+        <h3>Login</h3>
+        <input
+          class="form-control my-2"
+          placeholder="Email"
+          [(ngModel)]="email"
+        /><input
+          class="form-control my-2"
+          type="password"
+          placeholder="Password"
+          [(ngModel)]="password"
+        /><button class="btn btn-primary btn-block" (click)="login()">
+          Login
+        </button>
+        <p class="text-danger mt-2">{{ err }}</p>
+        <small>Admin: admin@gallery.com / admin123</small>
+      </div>
+    </div>
+  </div>`,
+})
+export class LoginComponent {
+  email = "";
+  password = "";
+  err = "";
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+  ) {}
+  login() {
+    this.auth.login({ email: this.email, password: this.password }).subscribe(
+      (r) => {
+        this.auth.save(r);
+        this.router.navigate(["/"]);
+      },
+      (e) => (this.err = "Invalid login"),
+    );
+  }
+}
