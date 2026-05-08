@@ -1,0 +1,82 @@
+<div class="container mt-4" *ngIf="image">
+  <!-- TOP BAR -->
+  <div class="top-action-bar mb-3">
+    <button class="btn btn-primary back-btn" (click)="goBack()">← Back</button>
+
+    <div class="category-top-bar">
+      <span class="category-label"> Category </span>
+
+      <span class="category-value">
+        {{ image.categoryName }}
+      </span>
+    </div>
+  </div>
+
+  <!-- MAIN ROW -->
+  <div class="row">
+    <!-- IMAGE -->
+    <div class="col-lg-4 col-md-12 mb-3 text-center">
+      <div class="card preview-card p-3 shadow">
+        <img
+          *ngIf="image?.imageUrl"
+          [src]="api.imageUrl(image.imageUrl)"
+          class="preview-img"
+          style="border: 5px solid red"
+        />
+      </div>
+    </div>
+
+    <!-- IMAGE DETAILS -->
+    <div class="col-lg-5 col-md-12 mb-3">
+      <div class="card preview-card p-4 shadow">
+        <div class="description-bar">DESCRIPTION</div>
+
+        <p class="description-text">
+          {{ image.description }}
+        </p>
+
+        <h2 class="image-title">
+          {{ image.name }}
+        </h2>
+
+        <div class="info-box mt-3">
+          <p><b>Category:</b> {{ image.categoryName }}</p>
+
+          <p><b>Code:</b> {{ image.imageCode }}</p>
+
+          <p><b>ID:</b> {{ image.id }}</p>
+
+          <h4 class="price-text">Cost: ₹{{ image.cost }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT + QR -->
+    <div class="col-lg-3 col-md-12 mb-3">
+      <div class="card contact-card p-4 shadow">
+        <div class="contact-bar">CONTACT DETAILS</div>
+
+        <p>
+          <b>WhatsApp:</b><br />
+          9441449636
+        </p>
+
+        <p>
+          <b>Email:</b><br />
+          admin@asprineminds.com
+        </p>
+
+        <p>
+          <b>Location:</b><br />
+          Andhra Pradesh, India
+        </p>
+
+        <h5 class="mt-3">QR Payment</h5>
+
+        <div class="qr-box">QR</div>
+
+        <p class="small mt-2 text-muted">Send payment screenshot to WhatsApp</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,9 +1,37 @@
 body {
-  background: #f5f7fb;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(0, 220, 255, 0.35), transparent 25%),
+    radial-gradient(circle at 85% 25%, rgba(255, 45, 120, 0.35), transparent 25%),
+    radial-gradient(circle at 50% 80%, rgba(255, 120, 0, 0.25), transparent 30%),
+    linear-gradient(135deg, #020b2e 0%, #061a55 35%, #170033 70%, #2d001d 100%);
+
   font-family: Arial, Helvetica, sans-serif;
+
+  min-height: 100vh;
+
+  background-attachment: fixed;
+
+  margin: 0;
+
+  padding: 0;
 }
 .navbar {
-  box-shadow: 0 2px 10px #ddd;
+  background:
+    linear-gradient(
+      90deg,
+      #001b52 0%,
+      #03106d 40%,
+      #220038 100%
+    ) !important;
+
+  box-shadow:
+    0 0 18px rgba(0, 234, 255, 0.4),
+    0 0 30px rgba(255, 60, 120, 0.35);
+
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 .card {
   border: 0;
@@ -29,4 +57,34 @@ body {
   border-radius: 20px;
   padding: 25px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+  color: white !important;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.navbar .nav-link:hover {
+  color: #ffd400 !important;
+  text-shadow: 0 0 8px #ffd400;
+}
+
+.top-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: white;
+  padding: 3px;
+  box-shadow: 0 0 12px #00eaff;
+}
+
+.brand-text {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
 }

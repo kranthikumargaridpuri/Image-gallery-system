@@ -1,0 +1,111 @@
+<div class="admin-box">
+  <h3>Admin Dashboard</h3>
+
+  <div class="row">
+    <div class="col-md-4">
+      <h5>Add Category</h5>
+
+      <input
+        class="form-control my-2"
+        placeholder="Category"
+        [(ngModel)]="catName"
+      />
+
+      <textarea
+        class="form-control my-2"
+        placeholder="Description"
+        [(ngModel)]="catDesc"
+      ></textarea>
+
+      <button class="btn btn-success" (click)="addCat()">
+        Save Category
+      </button>
+    </div>
+
+    <div class="col-md-8">
+      <h5>Upload Image</h5>
+
+      <input
+        class="form-control my-2"
+        placeholder="Image name"
+        [(ngModel)]="name"
+      />
+      <div class="text-danger" *ngIf="nameError">
+        {{ nameError }}
+      </div>
+
+      
+
+      <textarea
+        class="form-control my-2"
+        placeholder="Description"
+        [(ngModel)]="desc"
+      ></textarea>
+      <div class="text-danger" *ngIf="descError">
+        {{ descError }}
+      </div>
+
+      <input
+        class="form-control my-2"
+        type="number"
+        placeholder="Image Cost"
+        [(ngModel)]="cost"
+      />
+
+      <select class="form-control my-2" [(ngModel)]="categoryId">
+        <option value="">Select Category</option>
+        <option *ngFor="let c of categories" [value]="c.id">
+          {{ c.name }}
+        </option>
+      </select>
+      <div class="text-danger" *ngIf="categoryError">
+        {{ categoryError }}
+      </div>
+
+      <input
+        class="form-control my-2"
+        type="file"
+        (change)="file($event)"
+      />
+      <div class="text-danger" *ngIf="fileError">
+        {{ fileError }}
+      </div>
+
+      <button class="btn btn-primary mt-2" (click)="upload()">
+        Upload
+      </button>
+
+      <div class="text-success mt-2" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4 class="mt-4">Manage Images</h4>
+
+<table class="table bg-white">
+  <tr>
+    <th>Image</th>
+    <th>Name</th>
+    <th>Code</th>
+    <th>Cost</th>
+    <th>Category</th>
+    <th>Action</th>
+  </tr>
+
+  <tr *ngFor="let i of images">
+    <td>
+      <img [src]="api.imageUrl(i.imageUrl)" width="80" />
+    </td>
+    <td>{{ i.name }}</td>
+    <td>{{ i.imageCode }}</td>
+    <td>₹{{ i.cost }}</td>
+    <td>{{ i.categoryName }}</td>
+    <td>
+      <button class="btn btn-sm btn-danger" (click)="del(i.id)">
+        Delete
+      </button>
+    </td>
+  </tr>
+</table>

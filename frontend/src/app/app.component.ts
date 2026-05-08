@@ -1,2 +1,10 @@
-import { Component } from '@angular/core'; import { AuthService } from './services/auth.service';
-@Component({selector:'app-root',template:`<nav class="navbar navbar-expand navbar-dark bg-dark px-4"><a class="navbar-brand" routerLink="/">Image Gallery</a><div class="navbar-nav ml-auto"><a class="nav-link" routerLink="/">Gallery</a><a class="nav-link" routerLink="/cart" *ngIf="auth.loggedIn()">Cart</a><a class="nav-link" routerLink="/admin" *ngIf="auth.isAdmin()">Admin</a><a class="nav-link" routerLink="/login" *ngIf="!auth.loggedIn()">Login</a><a class="nav-link" routerLink="/register" *ngIf="!auth.loggedIn()">Register</a><a class="nav-link" href="#" *ngIf="auth.loggedIn()" (click)="auth.logout()">Logout</a></div></nav><div class="container mt-4"><router-outlet></router-outlet></div>`}) export class AppComponent{constructor(public auth:AuthService){}}
+import { Component } from "@angular/core";
+import { AuthService } from "./services/auth.service";
+@Component({
+  selector: "app-root",
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+})
+export class AppComponent {
+  constructor(public auth: AuthService) {}
+}

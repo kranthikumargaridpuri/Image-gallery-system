@@ -1,18 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ApiService } from "../services/api.service";
 @Component({
-  template: `<h3>My Cart</h3>
-    <div class="row">
-      <div class="col-md-4 mb-3" *ngFor="let item of items">
-        <div class="card p-3">
-          <img class="gallery-img" [src]="api.imageUrl(item.image.imageUrl)" />
-          <h5>{{ item.image.name }}</h5>
-          <button class="btn btn-danger" (click)="remove(item.image.id)">
-            Remove
-          </button>
-        </div>
-      </div>
-    </div>`,
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css'],
 })
 export class CartComponent implements OnInit {
   items: any[] = [];

@@ -1,42 +1,60 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+
 @Injectable({ providedIn: "root" })
 export class ApiService {
   api = "http://localhost:8080/api";
+
   constructor(private http: HttpClient) {}
+
   categories() {
     return this.http.get<any[]>(this.api + "/categories");
   }
+
   images() {
     return this.http.get<any[]>(this.api + "/images");
   }
-  search(k) {
+
+  getImageByCode(code: any) {
+    return this.http.get<any>(this.api + "/images/code/" + code);
+  }
+
+  search(k: any) {
     return this.http.get<any[]>(this.api + "/images/search?keyword=" + k);
   }
-  byCategory(id) {
+
+  byCategory(id: any) {
     return this.http.get<any[]>(this.api + "/images/category/" + id);
   }
+
   cart() {
     return this.http.get<any[]>(this.api + "/cart");
   }
-  addCart(id) {
+
+  addCart(id: any) {
     return this.http.post(this.api + "/cart/" + id, {});
   }
-  removeCart(id) {
+
+  removeCart(id: any) {
     return this.http.delete(this.api + "/cart/" + id);
   }
-  addCategory(c) {
+
+  addCategory(c: any) {
     return this.http.post(this.api + "/categories", c);
   }
-  upload(fd) {
+
+  upload(fd: any) {
     return this.http.post(this.api + "/admin/images", fd);
   }
-  deleteImage(id) {
+
+  deleteImage(id: any) {
     return this.http.delete(this.api + "/admin/images/" + id);
   }
-  imageUrl(path) {
-    return path && path.startsWith("/uploads")
-      ? "http://localhost:8080" + path
-      : path;
-  }
+
+ imageUrl(path: any) {
+  return path && path.startsWith("/uploads")
+    ? "http://localhost:8080" + path
+    : path;
+}
+
 }

@@ -1,4 +1,50 @@
-import { BrowserModule } from '@angular/platform-browser'; import { NgModule } from '@angular/core'; import { FormsModule } from '@angular/forms'; import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'; import { RouterModule, Routes } from '@angular/router';
-import { AppComponent } from './app.component'; import { LoginComponent } from './pages/login.component'; import { RegisterComponent } from './pages/register.component'; import { GalleryComponent } from './pages/gallery.component'; import { CartComponent } from './pages/cart.component'; import { AdminComponent } from './pages/admin.component'; import { AuthInterceptor } from './services/auth.interceptor'; import { AuthGuard } from './services/auth.guard';
-const routes: Routes = [{ path: '', component: GalleryComponent }, { path: 'login', component: LoginComponent }, { path: 'register', component: RegisterComponent }, { path: 'cart', component: CartComponent, canActivate: [AuthGuard] }, { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] }];
-@NgModule({ declarations: [AppComponent, LoginComponent, RegisterComponent, GalleryComponent, CartComponent, AdminComponent], imports: [BrowserModule, FormsModule, HttpClientModule, RouterModule.forRoot(routes)], providers: [AuthGuard, { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }], bootstrap: [AppComponent] }) export class AppModule { }
+import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { RouterModule, Routes } from "@angular/router";
+
+import { AppComponent } from "./app.component";
+import { LoginComponent } from "./pages/login.component";
+import { RegisterComponent } from "./pages/register.component";
+import { GalleryComponent } from "./pages/gallery.component";
+import { CartComponent } from "./pages/cart.component";
+import { AdminComponent } from "./pages/admin.component";
+import { ImagePreviewComponent } from "./image-preview/image-preview.component";
+
+import { AuthInterceptor } from "./services/auth.interceptor";
+import { AuthGuard } from "./services/auth.guard";
+
+const routes: Routes = [
+  { path: "", component: GalleryComponent },
+  { path: "login", component: LoginComponent },
+  { path: "register", component: RegisterComponent },
+  { path: "cart", component: CartComponent, canActivate: [AuthGuard] },
+  { path: "admin", component: AdminComponent, canActivate: [AuthGuard] },
+
+  { path: "image-preview/:id", component: ImagePreviewComponent },
+];
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    RegisterComponent,
+    GalleryComponent,
+    CartComponent,
+    AdminComponent,
+    ImagePreviewComponent,
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    RouterModule.forRoot(routes),
+  ],
+  providers: [
+    AuthGuard,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}

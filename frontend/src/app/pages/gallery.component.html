@@ -1,0 +1,257 @@
+<div class="top-banner">
+  <div class="row align-items-center">
+
+    <!-- LOGO -->
+    <div class="col-lg-3 col-md-12 text-center text-lg-left">
+
+      <div class="logo-box">
+        <img
+          src="assets/images/logo.png"
+          class="main-logo"
+        />
+      </div>
+
+    </div>
+
+    <!-- COUNTRY TIMES -->
+    <div class="col-lg-7 col-md-12">
+
+      <div class="country-time-row">
+
+        <div class="time-box">
+          <h5>INDIA</h5>
+          <p>{{ indiaTime }}</p>
+          <small>Live & Date</small>
+        </div>
+
+        <div class="time-box">
+          <h5>USA</h5>
+          <p>{{ usaTime }}</p>
+          <small>Live & Date</small>
+        </div>
+
+        <div class="time-box">
+          <h5>UK</h5>
+          <p>{{ ukTime }}</p>
+          <small>Live & Date</small>
+        </div>
+
+        <div class="time-box">
+          <h5>AUSTRALIA</h5>
+          <p>{{ australiaTime }}</p>
+          <small>Live & Date</small>
+        </div>
+
+        <div class="time-box">
+          <h5>KSA</h5>
+          <p>{{ ksaTime }}</p>
+          <small>Live & Date</small>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- LOGIN -->
+    <div class="col-lg-2 col-md-12 text-center">
+
+      <button
+        class="login-glow-btn"
+        routerLink="/login"
+      >
+        LOGIN
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="menu-bar mb-4">
+
+  <button routerLink="/">HOME</button>
+  <button>PRODUCT</button>
+  <button>CERTIFICATES</button>
+  <button>EVENTS</button>
+  <button>MEDIA</button>
+  <button>NEWS</button>
+  <button>DOWNLOADS</button>
+  <button>GALLERY</button>
+  <button>CONTACT</button>
+
+</div>
+
+<div class="container-fluid">
+
+  <div class="row">
+
+    <!-- LEFT -->
+    <div class="col-lg-2 col-md-3 mb-3">
+
+      <div class="sidebar-box">
+
+        <h5>ALL DESIGNS</h5>
+
+        <button
+          class="btn btn-outline-primary btn-block mb-2"
+          (click)="load()"
+        >
+          All Images
+        </button>
+
+        <button
+          class="btn btn-outline-secondary btn-block mb-2"
+          *ngFor="let c of categories"
+          (click)="cat(c.id)"
+        >
+          {{ c.name }}
+        </button>
+
+        <button
+          class="btn btn-outline-secondary btn-block mb-2"
+          routerLink="/login"
+        >
+          Login User
+        </button>
+
+        <button
+          class="btn btn-outline-secondary btn-block mb-2"
+          routerLink="/admin"
+        >
+          Admin
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- CENTER -->
+    <div class="col-lg-8 col-md-9">
+
+      <div class="search-premium mb-4">
+
+        <input
+          class="form-control search-input"
+          placeholder="Search Premium Designs..."
+          [(ngModel)]="keyword"
+        />
+
+        <button
+          class="btn btn-warning search-btn"
+          (click)="search()"
+        >
+          Search
+        </button>
+
+      </div>
+
+      <div class="image-panel">
+
+        <div class="row">
+
+          <div
+            class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-12 mb-4"
+            *ngFor="let img of images"
+          >
+
+            <div class="card image-card h-100 shadow-sm">
+
+              <img
+                class="gallery-img img-fluid"
+                [src]="
+                  img?.imageUrl
+                    ? api.imageUrl(img.imageUrl)
+                    : 'assets/images/logo.png'
+                "
+              />
+
+              <div class="card-body p-2 text-center">
+
+                <h5 class="image-name">
+                  {{ img?.name || "Image Name" }}
+                </h5>
+
+                <p class="image-code">
+                  <b>Code:</b>
+                  {{ img?.imageCode || "Not Generated" }}
+                </p>
+
+                <p class="price-text">
+                  Cost: ₹{{ img?.cost || 0 }}
+                </p>
+
+                <button
+                  class="btn view-btn btn-sm btn-block mt-2"
+                  (click)="viewImage(img.imageCode)"
+                  *ngIf="img?.imageCode"
+                >
+                  Preview
+                </button>
+
+                <button
+                  class="btn btn-primary btn-sm btn-block mt-2"
+                  *ngIf="auth.loggedIn() && img?.id"
+                  (click)="add(img.id)"
+                >
+                  Add to Cart
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-lg-2 d-none d-lg-block">
+
+      <div class="payment-box">
+
+        <h5>QR PAYMENT</h5>
+
+        <div class="qr-box">
+          QR
+        </div>
+
+        <p class="small mt-2">
+          Scan & Pay Instantly
+        </p>
+
+        <h5 class="whatsapp-title">
+          Whatsapp:
+        </h5>
+
+        <h4 class="whatsapp-no">
+          9441449636
+        </h4>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="secure-footer mt-4">
+  <span class="secure-bold">We 100% Secure,</span>
+  <span>
+    send the item code and payment screenshot to whatsapp, we will transfer file to same whatsapp.
+  </span>
+</div>
+
+<div class="main-footer">
+  <div>
+    Support: admin@asprineminds.com / Cell: +91 929149596 / Andhra Pradesh, INDIA
+  </div>
+  <div>
+    All Rights reserved by Asprine Minds
+  </div>
+</div>

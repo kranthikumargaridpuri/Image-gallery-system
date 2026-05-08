@@ -1,2 +1,58 @@
-import { Injectable } from '@angular/core'; import { HttpClient } from '@angular/common/http'; import { Router } from '@angular/router';
-@Injectable({providedIn:'root'}) export class AuthService{ api='http://localhost:8080/api'; constructor(private http:HttpClient,private router:Router){} login(data){return this.http.post<any>(this.api+'/auth/login',data)} register(data){return this.http.post<any>(this.api+'/auth/register',data)} save(r){localStorage.setItem('token',r.token);localStorage.setItem('role',r.role);localStorage.setItem('username',r.username)} token(){return localStorage.getItem('token')} loggedIn(){return !!this.token()} isAdmin(){return localStorage.getItem('role')==='ROLE_ADMIN'} logout(){localStorage.clear();this.router.navigate(['/login'])}}
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+
+@Injectable({ providedIn: "root" })
+export class AuthService {
+  api = "http://localhost:8080/api";
+
+  constructor(private http: HttpClient, private router: Router) {}
+
+  login(data: any) {
+    return this.http.post<any>(this.api + "/auth/login", data);
+  }
+
+  register(data: any) {
+    return this.http.post<any>(this.api + "/auth/register", data);
+  }
+
+  save(r: any) {
+    try {
+      window.localStorage.setItem("token", r.token);
+      window.localStorage.setItem("role", r.role);
+      window.localStorage.setItem("username", r.username);
+    } catch (e) {}
+  }
+
+  token() {
+    try {
+      return window.localStorage.getItem("token");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  loggedIn() {
+    try {
+      return !!window.localStorage.getItem("token");
+    } catch (e) {
+      return false;
+    }
+  }
+
+  isAdmin() {
+    try {
+      return window.localStorage.getItem("role") === "ROLE_ADMIN";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  logout() {
+    try {
+      window.localStorage.clear();
+    } catch (e) {}
+
+    this.router.navigate(["/login"]);
+  }
+}
