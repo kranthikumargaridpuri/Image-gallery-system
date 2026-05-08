@@ -1,7 +1,17 @@
 package com.asprineminds.gallery.entity;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "images")
@@ -17,8 +27,15 @@ public class GalleryImage {
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "category_id")
     private Category category;
     private LocalDateTime createdAt;
-
-    @PrePersist public void prePersist() { createdAt = LocalDateTime.now(); }
+    private Double cost;
+    private String imageCode;
+    public String getImageCode() {
+		return imageCode;
+	}
+	public void setImageCode(String imageCode) {
+		this.imageCode = imageCode;
+	}
+	@PrePersist public void prePersist() { createdAt = LocalDateTime.now(); }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
@@ -37,4 +54,12 @@ public class GalleryImage {
     public void setCategory(Category category) { this.category = category; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    
+	public Double getCost() {
+		return cost;
+	}
+	public void setCost(Double cost) {
+		this.cost = cost;
+	}
+    
 }

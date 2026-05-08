@@ -55,6 +55,8 @@ public class Dtos {
 		public Long id, categoryId;
 		public String name, description, imageUrl, categoryName;
 		public LocalDateTime createdAt;
+		public Double cost;
+		public String imageCode;
 	}
 
 	public static class CartResponse {
