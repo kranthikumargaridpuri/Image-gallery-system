@@ -3,10 +3,12 @@ package com.asprineminds.gallery.service;
 import com.asprineminds.gallery.dto.Dtos.ImageResponse;
 import com.asprineminds.gallery.entity.Category;
 import com.asprineminds.gallery.entity.GalleryImage;
+import com.asprineminds.gallery.repository.CartRepository;
 import com.asprineminds.gallery.repository.CategoryRepository;
 import com.asprineminds.gallery.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
@@ -22,19 +24,25 @@ public class ImageService {
 
     private final ImageRepository images;
     private final CategoryRepository cats;
+    private final CartRepository cartItems;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
-    public ImageService(ImageRepository images, CategoryRepository cats) {
+    public ImageService(ImageRepository images, CategoryRepository cats, CartRepository cartItems) {
         this.images = images;
         this.cats = cats;
+        this.cartItems = cartItems;
     }
 
     public ImageResponse upload(String name, String desc, Double cost, Long catId, MultipartFile file) throws Exception {
 
         Category c = cats.findById(catId)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+        
+        if (cost == null || cost < 0) {
+            throw new RuntimeException("Image cost cannot be negative");
+        }
 
         Files.createDirectories(Paths.get(uploadDir));
 
@@ -50,53 +58,41 @@ public class ImageService {
         GalleryImage gi = new GalleryImage();
 
         gi.setName(name);
-
         gi.setDescription(desc);
-
         gi.setCost(cost);
-
         gi.setCategory(c);
 
         String generatedCode = generateImageCode(c.getName());
 
         gi.setImageCode(generatedCode);
-
         gi.setFileName(fn);
-
         gi.setImageUrl("/uploads/" + fn);
-
         gi.setContentType(file.getContentType());
-
         gi.setSizeBytes(file.getSize());
 
         return map(images.save(gi));
     }
-    
+
     private String generateImageCode(String categoryName) {
 
         String prefix = "IMG";
 
         if (categoryName != null && categoryName.trim().length() >= 3) {
-
             prefix = categoryName.trim()
                     .substring(0, 3)
                     .toUpperCase();
-
         }
 
         String code;
 
         do {
-
             int number = 1000 + new Random().nextInt(9000);
-
             code = prefix + number;
-
         } while (images.existsByImageCode(code));
 
         return code;
     }
-    
+
     public List<ImageResponse> all() {
         List<ImageResponse> out = new ArrayList<ImageResponse>();
 
@@ -134,7 +130,9 @@ public class ImageService {
         return out;
     }
 
+    @Transactional
     public void delete(Long id) {
+        cartItems.deleteByImageId(id);
         images.deleteById(id);
     }
 
@@ -156,7 +154,7 @@ public class ImageService {
 
         return r;
     }
-    
+
     public ImageResponse getByCode(String imageCode) {
 
         GalleryImage img = images.findByImageCode(imageCode)

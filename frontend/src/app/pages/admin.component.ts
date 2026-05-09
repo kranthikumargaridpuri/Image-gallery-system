@@ -11,7 +11,6 @@ export class AdminComponent implements OnInit {
 
   catName = "";
   catDesc = "";
-  
 
   name = "";
   desc = "";
@@ -20,9 +19,10 @@ export class AdminComponent implements OnInit {
   cost = "";
   categoryId = "";
   nameError = "";
-descError = "";
-categoryError = "";
-fileError = "";
+  descError = "";
+  categoryError = "";
+  fileError = "";
+  costError = "";
 
   selected: any;
 
@@ -51,64 +51,70 @@ fileError = "";
     this.selected = e.target.files[0];
   }
 
-upload() {
+  upload() {
+    this.nameError = "";
+    this.descError = "";
+    this.categoryError = "";
+    this.fileError = "";
+    this.costError = "";
+    this.successMessage = "";
 
-  this.nameError = "";
-  this.descError = "";
-  this.categoryError = "";
-  this.fileError = "";
+    let valid = true;
 
-  let valid = true;
+    if (!this.name || this.name.trim() === "") {
+      this.nameError = "Image name is required";
+      valid = false;
+    }
 
-  if (!this.name || this.name.trim() === "") {
-    this.nameError = "Image name is required";
-    valid = false;
+    if (!this.desc || this.desc.trim() === "") {
+      this.descError = "Description is required";
+      valid = false;
+    }
+
+    if (!this.categoryId) {
+      this.categoryError = "Please select category";
+      valid = false;
+    }
+
+    if (!this.selected) {
+      this.fileError = "Please select image";
+      valid = false;
+    }
+
+    if (this.cost !== "" && Number(this.cost) < 0) {
+  this.costError = "Image cost cannot be negative";
+  valid = false;
+      }
+
+    if (!valid) {
+      return;
+    }
+
+    const fd = new FormData();
+
+    fd.append("name", this.name);
+    fd.append("description", this.desc);
+    fd.append("categoryId", this.categoryId);
+    fd.append("cost", this.cost);
+    fd.append("file", this.selected);
+
+    this.api.upload(fd).subscribe(
+      () => {
+        this.successMessage = "Image uploaded successfully";
+
+        this.name = "";
+        this.desc = "";
+        this.cost = "";
+        this.categoryId = "";
+        this.selected = null;
+
+        this.reload();
+      },
+      err => {
+        alert(err.error.message);
+      }
+    );
   }
-
-  if (!this.desc || this.desc.trim() === "") {
-    this.descError = "Description is required";
-    valid = false;
-  }
-
-  if (!this.categoryId) {
-    this.categoryError = "Please select category";
-    valid = false;
-  }
-
-  if (!this.selected) {
-    this.fileError = "Please select image";
-    valid = false;
-  }
-
-  if (!valid) {
-    return;
-  }
-
-  const fd = new FormData();
-
-  fd.append("name", this.name);
-  fd.append("description", this.desc);
-  fd.append("categoryId", this.categoryId);
-  
-  fd.append("cost", this.cost);
-  fd.append("file", this.selected);
-
-  this.api.upload(fd).subscribe(() => {
-
-    this.successMessage = "Image uploaded successfully";
-
-    this.name = "";
-    this.desc = "";
-    
-    this.cost = "";
-    this.categoryId = "";
-    this.selected = null;
-
-    this.reload();
-
-  });
-
-}
 
   del(id: number) {
     this.api.deleteImage(id).subscribe(() => this.reload());

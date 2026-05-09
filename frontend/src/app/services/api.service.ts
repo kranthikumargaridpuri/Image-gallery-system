@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 
 @Injectable({ providedIn: "root" })
 export class ApiService {
+
   api = "http://localhost:8080/api";
 
   constructor(private http: HttpClient) {}
@@ -51,10 +52,26 @@ export class ApiService {
     return this.http.delete(this.api + "/admin/images/" + id);
   }
 
- imageUrl(path: any) {
-  return path && path.startsWith("/uploads")
-    ? "http://localhost:8080" + path
-    : path;
-}
+  forgotPassword(email: string) {
+    return this.http.post<any>(
+      this.api + "/auth/forgot-password",
+      { email }
+    );
+  }
 
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post<any>(
+      this.api + "/auth/reset-password",
+      {
+        token,
+        newPassword
+      }
+    );
+  }
+
+  imageUrl(path: any) {
+    return path && path.startsWith("/uploads")
+      ? "http://localhost:8080" + path
+      : path;
+  }
 }

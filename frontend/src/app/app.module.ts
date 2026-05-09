@@ -14,6 +14,8 @@ import { ImagePreviewComponent } from "./image-preview/image-preview.component";
 
 import { AuthInterceptor } from "./services/auth.interceptor";
 import { AuthGuard } from "./services/auth.guard";
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 const routes: Routes = [
   { path: "", component: GalleryComponent },
@@ -23,6 +25,8 @@ const routes: Routes = [
   { path: "admin", component: AdminComponent, canActivate: [AuthGuard] },
 
   { path: "image-preview/:id", component: ImagePreviewComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+{ path: 'reset-password', component: ResetPasswordComponent },
 ];
 
 @NgModule({
@@ -34,6 +38,8 @@ const routes: Routes = [
     CartComponent,
     AdminComponent,
     ImagePreviewComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     BrowserModule,

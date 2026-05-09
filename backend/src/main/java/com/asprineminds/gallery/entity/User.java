@@ -13,7 +13,9 @@ public class User {
     @Column(nullable = false) private String password;
     @Enumerated(EnumType.STRING) private Role role;
     private LocalDateTime createdAt;
-
+    private String resetToken;
+    private Long resetTokenExpiry;
+    
     @PrePersist public void prePersist() { createdAt = LocalDateTime.now(); if (role == null) role = Role.ROLE_USER; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,4 +29,18 @@ public class User {
     public void setRole(Role role) { this.role = role; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+	public String getResetToken() {
+		return resetToken;
+	}
+	public void setResetToken(String resetToken) {
+		this.resetToken = resetToken;
+	}
+	public Long getResetTokenExpiry() {
+		return resetTokenExpiry;
+	}
+	public void setResetTokenExpiry(Long resetTokenExpiry) {
+		this.resetTokenExpiry = resetTokenExpiry;
+	}
+    
+    
 }

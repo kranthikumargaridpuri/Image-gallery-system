@@ -55,4 +55,15 @@ export class AuthService {
 
     this.router.navigate(["/login"]);
   }
+forgotPassword(email: string) {
+  return this.http.post<any>(this.api + '/auth/forgot-password', { email });
+}
+
+resetPassword(token: string, newPassword: string) {
+  return this.http.post<any>(this.api + '/auth/reset-password', {
+    token,
+    newPassword
+  });
+}
+
 }

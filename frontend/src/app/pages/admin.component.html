@@ -47,11 +47,11 @@
 
       <input
         class="form-control my-2"
-        type="number"
+        type="number" min="0"
         placeholder="Image Cost"
         [(ngModel)]="cost"
       />
-
+      <div class="text-danger">{{ costError }}</div>
       <select class="form-control my-2" [(ngModel)]="categoryId">
         <option value="">Select Category</option>
         <option *ngFor="let c of categories" [value]="c.id">
