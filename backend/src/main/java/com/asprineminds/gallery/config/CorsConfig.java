@@ -17,6 +17,7 @@ public class CorsConfig {
                         .allowedOrigins(
                                 "https://name-image-gallery-frontend.onrender.com",
                                 "http://localhost:4200"
+                                
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
