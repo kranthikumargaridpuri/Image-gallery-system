@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-  private apiUrl = 'https://image-gallery-system.onrender.com/api/auth';
+  private  api = 'https://image-gallery-system.onrender.com/api';
 
   constructor(private http: HttpClient, private router: Router) {}
 
