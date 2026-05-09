@@ -64,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/uploads/**"
             ).permitAll()
             .antMatchers("/api/admin/**").hasRole("ADMIN")
-            .anyRequest().authenticated();
+            .anyRequest().permitAll();
 
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
