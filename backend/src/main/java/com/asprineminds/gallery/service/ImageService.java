@@ -1,16 +1,5 @@
 package com.asprineminds.gallery.service;
 
-import com.asprineminds.gallery.dto.Dtos.ImageResponse;
-import com.asprineminds.gallery.entity.Category;
-import com.asprineminds.gallery.entity.GalleryImage;
-import com.asprineminds.gallery.repository.CartRepository;
-import com.asprineminds.gallery.repository.CategoryRepository;
-import com.asprineminds.gallery.repository.ImageRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,6 +7,18 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.asprineminds.gallery.dto.Dtos.ImageResponse;
+import com.asprineminds.gallery.entity.Category;
+import com.asprineminds.gallery.entity.GalleryImage;
+import com.asprineminds.gallery.repository.CartRepository;
+import com.asprineminds.gallery.repository.CategoryRepository;
+import com.asprineminds.gallery.repository.ImageRepository;
 
 @Service
 public class ImageService {

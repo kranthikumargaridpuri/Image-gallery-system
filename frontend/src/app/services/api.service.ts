@@ -70,8 +70,8 @@ private api = 'https://image-gallery-system.onrender.com/api';
   }
 
   imageUrl(path: any) {
-    return path && path.startsWith("/uploads")
-      ? "http://localhost:8080" + path
-      : path;
-  }
+  return path && path.startsWith("/uploads")
+    ? "https://image-gallery-system.onrender.com" + path
+    : path;
+}
 }
