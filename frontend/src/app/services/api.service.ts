@@ -4,7 +4,7 @@ import { HttpClient } from "@angular/common/http";
 @Injectable({ providedIn: "root" })
 export class ApiService {
 
-  api = "https://image-gallery-system.onrender.com/api"
+  private baseUrl = 'https://image-gallery-system.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
