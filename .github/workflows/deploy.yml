@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p deploy
           cp backend/target/*.jar deploy/image-gallery.jar
+          ls -l deploy
 
       - name: Set up Node 16
         uses: actions/setup-node@v4
@@ -38,12 +39,16 @@ jobs:
         run: |
           cd frontend
           npm install
-          npm run build -- --configuration production
+          npm run build
 
       - name: Prepare frontend files
         run: |
           mkdir -p deploy/frontend
+          echo "Checking frontend dist folder..."
+          ls -R frontend/dist
           cp -r frontend/dist/*/* deploy/frontend/
+          echo "Checking prepared frontend files..."
+          ls -l deploy/frontend
 
       - name: Copy backend jar to EC2
         uses: appleboy/scp-action@v0.1.7
