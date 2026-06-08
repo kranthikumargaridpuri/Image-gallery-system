@@ -30,15 +30,16 @@ jobs:
           cp backend/target/*.jar deploy/image-gallery.jar
           ls -l deploy
 
-      - name: Set up Node 16
+      - name: Set up Node 14
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '14'
 
       - name: Build frontend
         run: |
           cd frontend
           npm install
+          chmod +x ./node_modules/.bin/ng
           npm run build
 
       - name: Prepare frontend files
