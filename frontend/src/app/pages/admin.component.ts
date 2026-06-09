@@ -2,8 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { ApiService } from "../services/api.service";
 
 @Component({
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css'],
+  templateUrl: "./admin.component.html",
+  styleUrls: ["./admin.component.css"],
 })
 export class AdminComponent implements OnInit {
   categories: any[] = [];
@@ -14,17 +14,20 @@ export class AdminComponent implements OnInit {
 
   name = "";
   desc = "";
-  successMessage = "";
-
   cost = "";
   categoryId = "";
+
   nameError = "";
   descError = "";
   categoryError = "";
   fileError = "";
   costError = "";
+  successMessage = "";
 
   selected: any;
+
+  showDeleteBox = false;
+  selectedCategoryId: number = 0;
 
   constructor(public api: ApiService) {}
 
@@ -38,6 +41,13 @@ export class AdminComponent implements OnInit {
   }
 
   addCat() {
+    this.categoryError = "";
+
+    if (!this.catName || this.catName.trim() === "") {
+      this.categoryError = "Category name is required";
+      return;
+    }
+
     this.api
       .addCategory({ name: this.catName, description: this.catDesc })
       .subscribe(() => {
@@ -82,9 +92,9 @@ export class AdminComponent implements OnInit {
     }
 
     if (this.cost !== "" && Number(this.cost) < 0) {
-  this.costError = "Image cost cannot be negative";
-  valid = false;
-      }
+      this.costError = "Image cost cannot be negative";
+      valid = false;
+    }
 
     if (!valid) {
       return;
@@ -110,13 +120,41 @@ export class AdminComponent implements OnInit {
 
         this.reload();
       },
-      err => {
-        alert(err.error.message);
+      (err) => {
+        this.fileError = err.error && err.error.message
+          ? err.error.message
+          : "Upload failed";
       }
     );
   }
 
   del(id: number) {
     this.api.deleteImage(id).subscribe(() => this.reload());
+  }
+
+  openDeleteBox(id: number) {
+    this.selectedCategoryId = id;
+    this.showDeleteBox = true;
+  }
+
+  closeDeleteBox() {
+    this.showDeleteBox = false;
+    this.selectedCategoryId = 0;
+  }
+
+  confirmDeleteCategory() {
+    this.categoryError = "";
+
+    this.api.deleteCategory(this.selectedCategoryId).subscribe(
+      () => {
+        this.closeDeleteBox();
+        this.reload();
+      },
+      (error) => {
+        console.log(error);
+        this.closeDeleteBox();
+        this.categoryError = "Cannot delete category.";
+      }
+    );
   }
 }

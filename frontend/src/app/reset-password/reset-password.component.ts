@@ -2,25 +2,38 @@ import { Component } from '@angular/core';
 import { ApiService } from '../services/api.service';
 
 @Component({
-  templateUrl: './reset-password.component.html'
+  selector: 'app-reset-password',
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['./reset-password.component.css']
 })
 export class ResetPasswordComponent {
 
   token = '';
-  newPassword = '';
+  password = '';
+
   message = '';
 
   constructor(private api: ApiService) {}
 
-  submit() {
-    this.message = '';
+  reset() {
 
-    this.api.resetPassword(this.token, this.newPassword).subscribe(
-      res => {
-        this.message = res.message;
+    this.api.resetPassword({
+      token: this.token,
+      password: this.password
+    }).subscribe(
+
+      (res: any) => {
+
+        this.message = 'Password reset successful';
+
+        alert('Password reset successful');
       },
-      err => {
-        this.message = err.error.message || 'Reset failed';
+
+      (err: any) => {
+
+        console.log(err);
+
+        alert('Reset failed');
       }
     );
   }

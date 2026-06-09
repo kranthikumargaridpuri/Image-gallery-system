@@ -27,6 +27,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtFilter filter;
     private final UserDetailsService userDetailsService;
 
+    private static final String[] ALLOWED_ORIGINS = {
+            "http://localhost:4200",
+            "http://127.0.0.1:4200",
+            "http://34.194.188.175",
+            "http://34.194.188.175:80",
+            "http://gallery.asprineminds.com",
+            "https://gallery.asprineminds.com"
+    };
+
     public SecurityConfig(JwtFilter filter, UserDetailsService userDetailsService) {
         this.filter = filter;
         this.userDetailsService = userDetailsService;
@@ -73,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
 
-        cfg.setAllowedOriginPatterns(Arrays.asList("*"));
+        cfg.setAllowedOrigins(Arrays.asList(ALLOWED_ORIGINS));
         cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(Arrays.asList("*"));
         cfg.setAllowCredentials(true);

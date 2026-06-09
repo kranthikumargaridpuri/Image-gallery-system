@@ -3,8 +3,8 @@ import { ApiService } from "../services/api.service";
 import { AuthService } from "../services/auth.service";
 
 @Component({
-  templateUrl: './gallery.component.html',
-  styleUrls: ['./gallery.component.css']
+  templateUrl: "./gallery.component.html",
+  styleUrls: ["./gallery.component.css"]
 })
 export class GalleryComponent implements OnInit {
   images: any[] = [];
@@ -34,24 +34,44 @@ export class GalleryComponent implements OnInit {
   }
 
   updateTimes() {
-    this.indiaTime = new Date().toLocaleTimeString("en-IN", {
+    this.indiaTime = new Date().toLocaleTimeString("en-US", {
       timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
     });
 
     this.usaTime = new Date().toLocaleTimeString("en-US", {
       timeZone: "America/New_York",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
     });
 
-    this.ukTime = new Date().toLocaleTimeString("en-GB", {
+    this.ukTime = new Date().toLocaleTimeString("en-US", {
       timeZone: "Europe/London",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
     });
 
-    this.australiaTime = new Date().toLocaleTimeString("en-AU", {
+    this.australiaTime = new Date().toLocaleTimeString("en-US", {
       timeZone: "Australia/Sydney",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
     });
 
-    this.ksaTime = new Date().toLocaleTimeString("en-SA", {
+    this.ksaTime = new Date().toLocaleTimeString("en-US", {
       timeZone: "Asia/Riyadh",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
     });
   }
 
@@ -76,8 +96,8 @@ export class GalleryComponent implements OnInit {
   add(id: number) {
     this.api.addCart(id).subscribe(() => alert("Added to cart"));
   }
-  
+
   viewImage(code: string) {
-  window.location.href = "/image-preview/" + code;
-}
+    window.location.href = "/image-preview/" + code;
+  }
 }

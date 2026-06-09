@@ -1,0 +1,16 @@
+# Backend build output
+backend/target/
+
+# Backend runtime uploaded files
+backend/uploads/
+
+# Frontend dependencies/build output
+frontend/node_modules/
+frontend/dist/
+
+# IDE/system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

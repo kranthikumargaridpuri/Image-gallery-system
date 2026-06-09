@@ -1,77 +1,121 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
-@Injectable({ providedIn: "root" })
+@Injectable({
+  providedIn: 'root',
+})
 export class ApiService {
-private api = 'https://image-gallery-system.onrender.com/api';
-
+  api = environment.apiUrl;
+  baseUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) {}
 
-  categories() {
-    return this.http.get<any[]>(this.api + "/categories");
+  images() {
+    return this.http.get<any[]>(this.api + '/images');
   }
 
-  images() {
-    return this.http.get<any[]>(this.api + "/images");
+  getImages() {
+    return this.images();
+  }
+
+  getImageById(id: any) {
+    return this.http.get<any>(this.api + '/images/' + id);
   }
 
   getImageByCode(code: any) {
-    return this.http.get<any>(this.api + "/images/code/" + code);
+    return this.http.get<any>(this.api + '/images/code/' + code);
   }
 
-  search(k: any) {
-    return this.http.get<any[]>(this.api + "/images/search?keyword=" + k);
+  search(keyword: any) {
+    return this.http.get<any[]>(
+      this.api + '/images/search?keyword=' + encodeURIComponent(keyword)
+    );
+  }
+
+  searchImages(keyword: any) {
+    return this.search(keyword);
   }
 
   byCategory(id: any) {
-    return this.http.get<any[]>(this.api + "/images/category/" + id);
+    return this.http.get<any[]>(this.api + '/images/category/' + id);
   }
 
-  cart() {
-    return this.http.get<any[]>(this.api + "/cart");
+  getImagesByCategory(id: any) {
+    return this.byCategory(id);
   }
 
-  addCart(id: any) {
-    return this.http.post(this.api + "/cart/" + id, {});
-  }
-
-  removeCart(id: any) {
-    return this.http.delete(this.api + "/cart/" + id);
+  categories() {
+    return this.http.get<any[]>(this.api + '/categories');
   }
 
   addCategory(c: any) {
-    return this.http.post(this.api + "/categories", c);
+    return this.http.post(this.api + '/categories', c);
   }
 
-  upload(fd: any) {
-    return this.http.post(this.api + "/admin/images", fd);
+  deleteCategory(id: number) {
+    return this.http.delete(this.api + '/categories/' + id, {
+      responseType: 'text',
+    });
+  }
+
+  cart() {
+    return this.http.get<any[]>(this.api + '/cart');
+  }
+
+  getCart() {
+    return this.cart();
+  }
+
+  addCart(id: any) {
+    return this.http.post(this.api + '/cart/' + id, {});
+  }
+
+  addToCart(id: any) {
+    return this.addCart(id);
+  }
+
+  removeCart(id: any) {
+    return this.http.delete(this.api + '/cart/' + id);
+  }
+
+  removeFromCart(id: any) {
+    return this.removeCart(id);
+  }
+
+  upload(fd: FormData) {
+    return this.http.post(this.api + '/admin/images', fd);
+  }
+
+  uploadImage(fd: FormData) {
+    return this.upload(fd);
   }
 
   deleteImage(id: any) {
-    return this.http.delete(this.api + "/admin/images/" + id);
+    return this.http.delete(this.api + '/admin/images/' + id);
   }
 
-  forgotPassword(email: string) {
-    return this.http.post<any>(
-      this.api + "/auth/forgot-password",
-      { email }
-    );
+  forgotPassword(email: any) {
+    return this.http.post<any>(this.api + '/auth/forgot-password', { email });
   }
 
-  resetPassword(token: string, newPassword: string) {
-    return this.http.post<any>(
-      this.api + "/auth/reset-password",
-      {
-        token,
-        newPassword
-      }
-    );
+  resetPassword(data: any) {
+    return this.http.post<any>(this.api + '/auth/reset-password', data);
   }
 
-  imageUrl(path: any) {
-  return path && path.startsWith("/uploads")
-    ? "https://image-gallery-system.onrender.com" + path
-    : path;
-}
+  imageUrl(path: string) {
+    if (!path) {
+      return '';
+    }
+
+    if (path.startsWith('http')) {
+      return path;
+    }
+
+    if (path.startsWith('/')) {
+      return this.baseUrl + path;
+    }
+
+    return this.baseUrl + '/' + path;
+  }
 }

@@ -24,14 +24,10 @@ export class ForgotPasswordComponent {
     }
 
     this.api.forgotPassword(this.email).subscribe(
-      res => {
-        this.message = res.message;
-        this.token = res.token;
-        this.email = '';
-      },
-      err => {
-        this.errorMessage = err.error.message || 'Email not found';
-      }
-    );
+  (res: any) => {
+    this.message = res.message;
+    this.token = res.token;
+  }
+);
   }
 }

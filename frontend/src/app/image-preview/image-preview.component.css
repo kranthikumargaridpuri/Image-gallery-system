@@ -34,12 +34,14 @@
       font-weight: bold;
     }
 
-    .preview-card {
-      border-radius: 20px;
-      border: none;
-      background: linear-gradient(135deg, #ffffff, #f3f6ff);
-      box-shadow: 0 0 20px #00c8ff33;
-    }
+   .preview-card {
+  display: flex;
+  gap: 30px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 25px;
+  border: 1px solid #dee2e6;
+}
 
     .preview-img {
       width: 100%;
@@ -257,13 +259,10 @@
     flex: 1;
   }
 
-  .preview-img {
-  display: block;
-  width: 100%;
-  max-width: 420px;
-  height: 340px;
-  object-fit: contain;
-  background: white;
-  border: 3px solid red;
+  .preview-page {
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 30px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 }
