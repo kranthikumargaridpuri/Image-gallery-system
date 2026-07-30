@@ -1,76 +1,148 @@
+/* =====================================
+   TOP HEADER
+===================================== */
+
 .top-banner {
+  margin-bottom: 20px;
+  padding: 18px;
   background: linear-gradient(90deg, #001847, #061d73, #2d003d);
   border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 20px rgba(0,255,255,0.25);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .main-logo {
+  display: block;
   width: 120px;
   height: 90px;
   object-fit: contain;
 }
 
+/* =====================================
+   COUNTRY DATE AND TIME
+===================================== */
+
 .country-time-row {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  align-items: stretch;
   justify-content: center;
+  gap: 10px;
 }
 
 .time-box {
-  background: rgba(255,255,255,0.08);
-  padding: 12px;
-  border-radius: 14px;
-  min-width: 110px;
+  min-width: 125px;
+  min-height: 92px;
+  padding: 10px 12px;
   text-align: center;
-  color: white;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.time-box h5,
+.country-date,
+.country-time {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .time-box h5 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: bold;
+  margin: 0 0 4px;
 }
 
 .time-box p {
-  margin: 4px 0;
-  font-size: 13px;
+  margin: 0;
 }
 
+.country-date {
+  min-height: 20px;
+}
+
+.country-time {
+  min-height: 20px;
+}
+
+/* =====================================
+   LOGIN BUTTON
+===================================== */
+
 .login-glow-btn {
+  padding: 11px 28px;
+  color: #ffffff;
+  font-weight: 700;
   background: linear-gradient(90deg, #00b7ff, #007bff);
-  color: white;
   border: none;
   border-radius: 30px;
-  padding: 10px 25px;
-  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0, 183, 255, 0.5);
+  cursor: pointer;
 }
+
+.login-glow-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 22px rgba(0, 183, 255, 0.8);
+}
+
+/* =====================================
+   MENU
+===================================== */
 
 .menu-bar {
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
 .menu-bar button {
-  background: #061d73;
-  color: white;
-  border: none;
   padding: 10px 18px;
-  border-radius: 25px;
+  color: #ffffff;
   font-size: 13px;
+  background: #061d73;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.menu-bar button:hover {
+  background: #0b36b8;
+}
+
+/* =====================================
+   MAIN LAYOUT
+===================================== */
+
+.container-fluid {
+  min-height: auto;
+  overflow: visible;
 }
 
 .sidebar-box {
-  background: rgba(255,255,255,0.08);
   padding: 18px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  color: white;
 }
+
+.sidebar-box h5 {
+  margin-bottom: 15px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* =====================================
+   SEARCH
+===================================== */
 
 .search-premium {
   display: flex;
@@ -78,155 +150,201 @@
 }
 
 .search-input {
-  border-radius: 25px;
+  padding: 12px 18px;
   border: none;
-  padding: 12px;
+  border-radius: 25px;
 }
 
 .search-btn {
-  border-radius: 25px;
   padding: 10px 25px;
+  border-radius: 25px;
 }
 
+/* =====================================
+   IMAGE GALLERY
+===================================== */
+
 .image-panel {
-  background: rgba(255,255,255,0.05);
-  border-radius: 20px;
+  min-height: 240px;
+  height: auto;
+  margin-bottom: 30px;
   padding: 20px;
+  overflow: visible;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+}
+
+.image-panel .row {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .image-card {
-  border-radius: 18px;
   overflow: hidden;
+  background: #ffffff;
   border: none;
+  border-radius: 18px;
 }
 
 .gallery-img {
+  display: block;
   width: 100%;
   height: 220px;
   object-fit: cover;
 }
 
 .image-name {
+  color: #222222;
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .image-code {
+  color: #555555;
   font-size: 13px;
-  color: #555;
 }
 
 .price-text {
   color: green;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .view-btn {
+  color: #ffffff;
   background: linear-gradient(90deg, #00b7ff, #007bff);
   border: none;
-  color: white;
 }
 
-.payment-box {
-  background: rgba(255,255,255,0.08);
-  border-radius: 18px;
-  padding: 20px;
-  color: white;
-  text-align: center;
+.image-panel .text-center h5 {
+  color: #ffffff;
 }
 
-.qr-box {
-  height: 180px;
-  background: white;
-  border-radius: 12px;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
-  font-weight: bold;
+.image-panel .text-center p {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.whatsapp-title {
-  margin-top: 18px;
-}
+/* =====================================
+   PAYMENT SIDEBAR
+===================================== */
 
-.whatsapp-no {
-  color: #00ff99;
-}
-
-.secure-footer {
-  text-align: center;
-  color: white;
-  margin-top: 25px;
-}
-
-.main-footer {
-  text-align: center;
-  color: #ccc;
-  padding: 18px;
-  font-size: 13px;
-}
-
-.container-fluid {
-  min-height: auto;
-  overflow: visible;
-}
-
-.image-panel {
-  background: rgba(255,255,255,0.05);
-  border-radius: 20px;
-  padding: 20px;
-  min-height: auto;
-  height: auto;
-  overflow: visible;
-  margin-bottom: 30px;
-}
-
-.image-panel .row {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.sidebar-box,
 .payment-box {
   position: sticky;
   top: 15px;
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
+  width: 100%;
+  padding: 15px;
+  overflow: visible;
+  text-align: center;
+  color: #222222;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
-.main-footer,
+.payment-heading {
+  margin-bottom: 10px;
+  color: #061d73;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.payee-name {
+  margin-bottom: 10px;
+  color: #333333;
+  font-size: 13px;
+}
+
+.payee-name strong {
+  display: block;
+  margin-top: 3px;
+  color: #111111;
+  font-size: 15px;
+}
+
+/* =====================================
+   QR IMAGE
+===================================== */
+
+.qr-box {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 260px;
+  margin: 10px auto;
+  padding: 5px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+}
+
+.payment-qr-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.upi-details {
+  margin-top: 10px;
+  padding: 10px 6px;
+  overflow-wrap: anywhere;
+  color: #333333;
+  background: #f2f2f2;
+  border-radius: 6px;
+}
+
+.upi-details span {
+  display: block;
+  margin-bottom: 3px;
+  color: #666666;
+  font-size: 11px;
+}
+
+.upi-details strong {
+  display: block;
+  color: #222222;
+  font-size: 12px;
+}
+
+.whatsapp-title {
+  margin-top: 15px;
+  margin-bottom: 4px;
+  color: #222222;
+  font-size: 15px;
+}
+
+.whatsapp-no {
+  display: inline-block;
+  color: #128c7e;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.whatsapp-no:hover {
+  color: #075e54;
+  text-decoration: none;
+}
+
+/* =====================================
+   SECURE INFORMATION
+===================================== */
+
 .secure-footer {
   clear: both;
   position: relative;
   z-index: 1;
-}
-
-.image-panel .row {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.sidebar-box,
-.payment-box {
-  position: sticky;
-  top: 15px;
-  max-height: none;
-  overflow: visible;
-}
-
-.secure-footer {
-  background: linear-gradient(90deg, #ffd400, #ffb300, #ffd400);
+  margin: 25px 60px 0;
+  padding: 12px 18px;
   color: #7a0000;
-  padding: 10px 18px;
   text-align: center;
-  font-size: 18px;
-  border-radius: 0;
+  font-size: 17px;
   font-weight: 500;
+  background: linear-gradient(90deg, #ffd400, #ffb300, #ffd400);
   box-shadow: 0 0 18px rgba(255, 204, 0, 0.8);
-  margin-left: 60px;
-  margin-right: 60px;
   transform: skewX(-10deg);
 }
 
@@ -236,24 +354,86 @@
 }
 
 .secure-bold {
-  font-weight: 900;
-  color: #b00000;
   margin-right: 8px;
+  color: #b00000;
+  font-weight: 900;
 }
+
+/* =====================================
+   MAIN FOOTER
+===================================== */
 
 .main-footer {
+  clear: both;
+  position: relative;
+  z-index: 1;
+  padding: 16px 20px;
+  color: #ffffff;
   text-align: center;
-  color: white;
-  padding: 12px;
-  font-size: 17px;
-  font-weight: 500;
-  text-shadow: 0 0 8px #00c8ff;
+  font-size: 15px;
+  background: #1d1d1d;
 }
 
+.footer-contact {
+  margin-bottom: 6px;
+  line-height: 1.8;
+}
+
+.main-footer a {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.main-footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-separator {
+  margin: 0 7px;
+}
+
+.footer-rights {
+  font-size: 13px;
+}
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 991px) {
+  .country-time-row {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .payment-box {
+    position: static;
+    max-width: 420px;
+    margin: 20px auto 0;
+  }
+
+  .main-logo {
+    margin: 0 auto;
+  }
+}
+
+/* =====================================
+   MOBILE
+===================================== */
+
 @media (max-width: 768px) {
+  .search-premium {
+    flex-direction: column;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
   .secure-footer {
-    margin-left: 10px;
     margin-right: 10px;
+    margin-left: 10px;
     font-size: 14px;
     transform: none;
   }
@@ -264,5 +444,25 @@
 
   .main-footer {
     font-size: 13px;
+  }
+}
+
+@media (max-width: 576px) {
+  .top-banner {
+    padding: 12px;
+  }
+
+  .time-box {
+    width: calc(50% - 10px);
+    min-width: 130px;
+  }
+
+  .footer-separator {
+    display: none;
+  }
+
+  .footer-contact span,
+  .footer-contact a {
+    display: inline;
   }
 }

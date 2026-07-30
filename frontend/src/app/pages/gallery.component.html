@@ -3,90 +3,111 @@
 
     <!-- LOGO -->
     <div class="col-lg-3 col-md-12 text-center text-lg-left">
-
       <div class="logo-box">
         <img
           src="assets/images/logo.png"
           class="main-logo"
+          alt="Global Traders Logo"
         />
       </div>
-
     </div>
 
-    <!-- COUNTRY TIMES -->
+    <!-- COUNTRY DATE AND TIME -->
     <div class="col-lg-7 col-md-12">
-
       <div class="country-time-row">
 
         <div class="time-box">
           <h5>INDIA</h5>
-          <p>{{ indiaTime }}</p>
-          
+          <p class="country-date">{{ indiaDate }}</p>
+          <p class="country-time">{{ indiaTime }}</p>
         </div>
 
         <div class="time-box">
           <h5>USA</h5>
-          <p>{{ usaTime }}</p>
-          
+          <p class="country-date">{{ usaDate }}</p>
+          <p class="country-time">{{ usaTime }}</p>
         </div>
 
         <div class="time-box">
           <h5>UK</h5>
-          <p>{{ ukTime }}</p>
-          
+          <p class="country-date">{{ ukDate }}</p>
+          <p class="country-time">{{ ukTime }}</p>
         </div>
 
         <div class="time-box">
           <h5>AUSTRALIA</h5>
-          <p>{{ australiaTime }}</p>
-         
+          <p class="country-date">{{ australiaDate }}</p>
+          <p class="country-time">{{ australiaTime }}</p>
         </div>
 
         <div class="time-box">
           <h5>KSA</h5>
-          <p>{{ ksaTime }}</p>
-         
+          <p class="country-date">{{ ksaDate }}</p>
+          <p class="country-time">{{ ksaTime }}</p>
         </div>
 
       </div>
-
     </div>
 
     <!-- LOGIN -->
     <div class="col-lg-2 col-md-12 text-center">
-
       <button
+        type="button"
         class="login-glow-btn"
         routerLink="/login"
       >
         LOGIN
       </button>
-
     </div>
 
   </div>
 </div>
 
-<!-- MENU -->
+<!-- MAIN MENU -->
 <div class="menu-bar mb-4">
 
-  <button routerLink="/">HOME</button>
-  <button>PRODUCT</button>
-  <button>CERTIFICATES</button>
-  <button>EVENTS</button>
-  <button>MEDIA</button>
-  <button>NEWS</button>
-  <button>DOWNLOADS</button>
-  <button>GALLERY</button>
-  <button>CONTACT</button>
+  <button type="button" routerLink="/">
+    HOME
+  </button>
+
+  <button type="button">
+    PRODUCT
+  </button>
+
+  <button type="button">
+    CERTIFICATES
+  </button>
+
+  <button type="button">
+    EVENTS
+  </button>
+
+  <button type="button">
+    MEDIA
+  </button>
+
+  <button type="button">
+    NEWS
+  </button>
+
+  <button type="button">
+    DOWNLOADS
+  </button>
+
+  <button type="button">
+    GALLERY
+  </button>
+
+  <button type="button">
+    CONTACT
+  </button>
 
 </div>
 
 <div class="container-fluid">
-
   <div class="row">
 
-    <!-- LEFT -->
+    <!-- LEFT SIDEBAR -->
     <div class="col-lg-2 col-md-3 mb-3">
 
       <div class="sidebar-box">
@@ -94,6 +115,7 @@
         <h5>ALL DESIGNS</h5>
 
         <button
+          type="button"
           class="btn btn-outline-primary btn-block mb-2"
           (click)="load()"
         >
@@ -101,6 +123,7 @@
         </button>
 
         <button
+          type="button"
           class="btn btn-outline-secondary btn-block mb-2"
           *ngFor="let c of categories"
           (click)="cat(c.id)"
@@ -109,6 +132,7 @@
         </button>
 
         <button
+          type="button"
           class="btn btn-outline-secondary btn-block mb-2"
           routerLink="/login"
         >
@@ -116,6 +140,7 @@
         </button>
 
         <button
+          type="button"
           class="btn btn-outline-secondary btn-block mb-2"
           routerLink="/admin"
         >
@@ -126,12 +151,14 @@
 
     </div>
 
-    <!-- CENTER -->
+    <!-- CENTER CONTENT -->
     <div class="col-lg-8 col-md-9">
 
+      <!-- SEARCH -->
       <div class="search-premium mb-4">
 
         <input
+          type="text"
           class="form-control search-input"
           placeholder="Search Premium Designs..."
           [(ngModel)]="keyword"
@@ -139,6 +166,7 @@
         />
 
         <button
+          type="button"
           class="btn btn-warning search-btn"
           (click)="search()"
         >
@@ -147,6 +175,7 @@
 
       </div>
 
+      <!-- IMAGE GALLERY -->
       <div class="image-panel">
 
         <div class="row">
@@ -165,17 +194,18 @@
                     ? api.imageUrl(img.imageUrl)
                     : 'assets/images/logo.png'
                 "
+                [alt]="img?.name || 'Gallery Image'"
               />
 
               <div class="card-body p-2 text-center">
 
                 <h5 class="image-name">
-                  {{ img?.name || "Image Name" }}
+                  {{ img?.name || 'Image Name' }}
                 </h5>
 
                 <p class="image-code">
                   <b>Code:</b>
-                  {{ img?.imageCode || "Not Generated" }}
+                  {{ img?.imageCode || 'Not Generated' }}
                 </p>
 
                 <p class="price-text">
@@ -183,14 +213,16 @@
                 </p>
 
                 <button
+                  type="button"
                   class="btn view-btn btn-sm btn-block mt-2"
-                  (click)="viewImage(img.imageCode)"
                   *ngIf="img?.imageCode"
+                  (click)="viewImage(img.imageCode)"
                 >
                   Preview
                 </button>
 
                 <button
+                  type="button"
                   class="btn btn-primary btn-sm btn-block mt-2"
                   *ngIf="auth.loggedIn() && img?.id"
                   (click)="add(img.id)"
@@ -206,53 +238,147 @@
 
         </div>
 
+        <!-- EMPTY STATE -->
+        <div
+          class="text-center py-5"
+          *ngIf="!images || images.length === 0"
+        >
+
+          <h5>No designs found</h5>
+
+          <p>
+            Try another keyword or select a different category.
+          </p>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="load()"
+          >
+            View All Images
+          </button>
+
+        </div>
+
       </div>
 
     </div>
 
-    <!-- RIGHT -->
-    <div class="col-lg-2 d-none d-lg-block">
+    <!-- RIGHT PAYMENT SIDEBAR -->
+    <div class="col-lg-2 col-md-12">
 
       <div class="payment-box">
 
-        <h5>QR PAYMENT</h5>
-
-        <div class="qr-box">
-          QR
-        </div>
-
-        <p class="small mt-2">
-          Scan & Pay Instantly
-        </p>
-
-        <h5 class="whatsapp-title">
-          Whatsapp:
+        <h5 class="payment-heading">
+          QR PAYMENT
         </h5>
 
-        <h4 class="whatsapp-no">
-          9441449636
-        </h4>
+        <p class="payee-name">
+          Pay to
+          <strong>GLOBAL TRADERS</strong>
+        </p>
+
+        <!-- QR IMAGE -->
+        <div class="qr-box">
+
+          <img
+            src="assets/images/payment-qr.jpeg"
+            alt="Global Traders UPI Payment QR Code"
+            class="payment-qr-image"
+          />
+
+        </div>
+
+        <p class="small mt-2 mb-2">
+          Scan and Pay Instantly
+        </p>
+
+        <div class="upi-details">
+
+          <span>UPI ID</span>
+
+          <strong>
+            gdpkki.traders5696@kotak
+          </strong>
+
+        </div>
+
+        <h5 class="whatsapp-title">
+          WhatsApp
+        </h5>
+
+        <a
+          class="whatsapp-no"
+          href="https://wa.me/919281495696"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          9281495696
+        </a>
+
+        <a
+          class="btn btn-success btn-sm btn-block mt-3"
+          href="https://wa.me/919281495696"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Send Payment Screenshot
+        </a>
 
       </div>
 
     </div>
 
   </div>
-
 </div>
 
+<!-- SECURE INFORMATION -->
 <div class="secure-footer mt-4">
-  <span class="secure-bold">We 100% Secure,</span>
-  <span>
-    send the item code and payment screenshot to whatsapp, we will transfer file to same whatsapp.
+
+  <span class="secure-bold">
+    We are 100% Secure.
   </span>
+
+  <span>
+    Send the item code and payment screenshot through WhatsApp.
+    We will transfer the purchased file to the same WhatsApp number.
+  </span>
+
 </div>
 
+<!-- MAIN FOOTER -->
 <div class="main-footer">
-  <div>
-    Support: admin@asprineminds.com / Cell: +91 929149596 / Andhra Pradesh, INDIA
+
+  <div class="footer-contact">
+
+    <span>Support:</span>
+
+    <a href="mailto:admin@asprineminds.com">
+      admin@asprineminds.com
+    </a>
+
+    <span class="footer-separator">
+      /
+    </span>
+
+    <span>Cell:</span>
+
+    <a href="tel:+919281495696">
+      +91 9281495696
+    </a>
+
+    <span class="footer-separator">
+      /
+    </span>
+
+    <span>
+      Andhra Pradesh, INDIA
+    </span>
+
   </div>
-  <div>
-    All Rights reserved by Asprine Minds
+
+  <div class="footer-rights">
+    All Rights Reserved by Asprine Minds
   </div>
+
 </div>
