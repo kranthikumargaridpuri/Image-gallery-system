@@ -1,14 +1,13 @@
 <div class="container mt-4" *ngIf="image">
   <!-- TOP BAR -->
   <div class="top-action-bar mb-3">
-    <button class="btn btn-primary back-btn" (click)="goBack()">← Back</button>
+    <button class="btn btn-primary back-btn" type="button" (click)="goBack()">
+      ← Back
+    </button>
 
     <div class="category-top-bar">
-      <span class="category-label"> Category </span>
-
-      <span class="category-value">
-        {{ image.categoryName }}
-      </span>
+      <span class="category-label">Category</span>
+      <span class="category-value">{{ image.categoryName }}</span>
     </div>
   </div>
 
@@ -20,8 +19,8 @@
         <img
           *ngIf="image?.imageUrl"
           [src]="api.imageUrl(image.imageUrl)"
+          [alt]="image?.name || 'Image preview'"
           class="preview-img"
-          style="border: 5px solid red"
         />
       </div>
     </div>
@@ -41,24 +40,21 @@
 
         <div class="info-box mt-3">
           <p><b>Category:</b> {{ image.categoryName }}</p>
-
           <p><b>Code:</b> {{ image.imageCode }}</p>
-
           <p><b>ID:</b> {{ image.id }}</p>
-
           <h4 class="price-text">Cost: ₹{{ image.cost }}</h4>
         </div>
       </div>
     </div>
 
-    <!-- CONTACT + QR -->
+    <!-- CONTACT + UPI QR -->
     <div class="col-lg-3 col-md-12 mb-3">
       <div class="card contact-card p-4 shadow">
         <div class="contact-bar">CONTACT DETAILS</div>
 
         <p>
           <b>WhatsApp:</b><br />
-          9441449636
+          9281495696
         </p>
 
         <p>
@@ -71,12 +67,34 @@
           Andhra Pradesh, India
         </p>
 
-        <h5 class="mt-3">QR Payment</h5>
+        <h5 class="mt-3 qr-heading">QR Payment</h5>
 
-        <div class="qr-box">QR</div>
+        <div class="qr-box">
+          <img
+            src="assets/images/payment-qr.jpeg"
+            alt="Global Traders UPI Payment QR Code"
+            class="payment-qr-image"
+          />
+        </div>
 
-        <p class="small mt-2 text-muted">Send payment screenshot to WhatsApp</p>
+        <p class="scan-text">Scan and Pay Instantly</p>
+        <p class="small mt-2 mb-0 text-muted">
+          Send payment screenshot to WhatsApp
+        </p>
       </div>
     </div>
   </div>
+</div>
+
+<!-- LOADING -->
+<div class="container mt-5 text-center" *ngIf="loading">
+  <p>Loading image details...</p>
+</div>
+
+<!-- ERROR -->
+<div class="container mt-5 text-center" *ngIf="!loading && errorMessage">
+  <h4>{{ errorMessage }}</h4>
+  <button class="btn btn-primary mt-3" type="button" (click)="goBack()">
+    Back to Gallery
+  </button>
 </div>

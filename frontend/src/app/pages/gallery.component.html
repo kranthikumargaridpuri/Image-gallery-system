@@ -1,21 +1,58 @@
-<div class="top-banner">
-  <div class="row align-items-center">
+<div
+  class="top-banner"
+  style="
+    position: relative;
+    height: 105px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  "
+>
+  <!-- LARGE LEFT LOGO -->
+  <div
+    style="
+      position: absolute;
+      left: 58px;
+      top: 4px;
+      z-index: 20;
+    "
+  >
+    <img
+      src="assets/images/global-digipic-logo-4x6cm.jpeg"
+      alt="Global Digipic Logo"
+      class="main-logo"
+      style="
+        width: 118px;
+        height: 158px;
+        object-fit: contain;
+        display: block;
+        max-width: none;
+      "
+    />
+  </div>
 
-    <!-- LOGO -->
-    <div class="col-lg-3 col-md-12 text-center text-lg-left">
-      <div class="logo-box">
-        <img
-          src="assets/images/logo.png"
-          class="main-logo"
-          alt="Global Traders Logo"
-        />
-      </div>
-    </div>
-
-    <!-- COUNTRY DATE AND TIME -->
-    <div class="col-lg-7 col-md-12">
-      <div class="country-time-row">
-
+  <!-- COUNTRY TIME AND LOGIN -->
+  <div
+    class="row no-gutters align-items-center"
+    style="
+      height: 105px;
+      margin: 0 18px 0 300px;
+      padding: 0;
+    "
+  >
+    <div class="col-lg-9 col-md-12">
+      <div
+        class="country-time-row"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: nowrap;
+          gap: 10px;
+          margin: 0;
+          padding: 0;
+        "
+      >
         <div class="time-box">
           <h5>INDIA</h5>
           <p class="country-date">{{ indiaDate }}</p>
@@ -45,12 +82,10 @@
           <p class="country-date">{{ ksaDate }}</p>
           <p class="country-time">{{ ksaTime }}</p>
         </div>
-
       </div>
     </div>
 
-    <!-- LOGIN -->
-    <div class="col-lg-2 col-md-12 text-center">
+    <div class="col-lg-3 col-md-12 text-center">
       <button
         type="button"
         class="login-glow-btn"
@@ -59,13 +94,17 @@
         LOGIN
       </button>
     </div>
-
   </div>
 </div>
 
 <!-- MAIN MENU -->
-<div class="menu-bar mb-4">
-
+<div
+  class="menu-bar mb-3"
+  style="
+    margin-top: 0;
+    padding-left: 345px;
+  "
+>
   <button type="button" routerLink="/">
     HOME
   </button>
@@ -101,7 +140,6 @@
   <button type="button">
     CONTACT
   </button>
-
 </div>
 
 <div class="container-fluid">
@@ -192,7 +230,7 @@
                 [src]="
                   img?.imageUrl
                     ? api.imageUrl(img.imageUrl)
-                    : 'assets/images/logo.png'
+                    : 'assets/images/global-digipic-logo-4x6cm.jpeg'
                 "
                 [alt]="img?.name || 'Gallery Image'"
               />
@@ -268,15 +306,6 @@
     <div class="col-lg-2 col-md-12">
 
       <div class="payment-box">
-
-        <h5 class="payment-heading">
-          QR PAYMENT
-        </h5>
-
-        <p class="payee-name">
-          Pay to
-          <strong>GLOBAL TRADERS</strong>
-        </p>
 
         <!-- QR IMAGE -->
         <div class="qr-box">

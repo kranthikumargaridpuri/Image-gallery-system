@@ -7,6 +7,7 @@ import com.asprineminds.gallery.entity.Role;
 import com.asprineminds.gallery.entity.User;
 import com.asprineminds.gallery.repository.UserRepository;
 import com.asprineminds.gallery.security.JwtUtil;
+import com.asprineminds.gallery.service.EmailService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,12 +28,14 @@ public class AuthController {
     private final PasswordEncoder enc;
     private final AuthenticationManager auth;
     private final JwtUtil jwt;
+    private final EmailService emailService;
 
-    public AuthController(UserRepository repo, PasswordEncoder enc, AuthenticationManager auth, JwtUtil jwt) {
+    public AuthController(UserRepository repo, PasswordEncoder enc, AuthenticationManager auth, JwtUtil jwt, EmailService emailService) {
         this.repo = repo;
         this.enc = enc;
         this.auth = auth;
         this.jwt = jwt;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
@@ -74,43 +77,62 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> req) {
+        String email = req.get("email");
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("Email is required");
+        }
 
-        User user = repo.findByEmail(req.get("email"))
-                .orElseThrow(() -> new RuntimeException("Email not found"));
+        repo.findByEmail(email.trim().toLowerCase()).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            user.setResetToken(token);
+            user.setResetTokenExpiry(System.currentTimeMillis() + 15 * 60 * 1000);
+            repo.save(user);
 
-        String token = UUID.randomUUID().toString();
-
-        user.setResetToken(token);
-        user.setResetTokenExpiry(System.currentTimeMillis() + 15 * 60 * 1000);
-
-        repo.save(user);
+            try {
+                emailService.sendPasswordResetEmail(user.getEmail(), user.getUsername(), token);
+            } catch (RuntimeException ex) {
+                user.setResetToken(null);
+                user.setResetTokenExpiry(null);
+                repo.save(user);
+                throw ex;
+            }
+        });
 
         Map<String, String> res = new HashMap<>();
-        res.put("message", "Reset token generated");
-        res.put("token", token);
-
+        res.put("message", "If the email is registered, a password reset link has been sent.");
         return ResponseEntity.ok(res);
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
+        String token = req.get("token");
+        String newPassword = req.get("newPassword");
 
-        User user = repo.findByResetToken(req.get("token"))
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
-
-        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry() < System.currentTimeMillis()) {
-            throw new RuntimeException("Token expired");
+        if (token == null || token.trim().isEmpty()) {
+            throw new RuntimeException("Reset token is required");
+        }
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new RuntimeException("Password must contain at least 8 characters");
         }
 
-        user.setPassword(enc.encode(req.get("newPassword")));
+        User user = repo.findByResetToken(token.trim())
+                .orElseThrow(() -> new RuntimeException("Invalid or already used reset link"));
+
+        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry() < System.currentTimeMillis()) {
+            user.setResetToken(null);
+            user.setResetTokenExpiry(null);
+            repo.save(user);
+            throw new RuntimeException("Reset link has expired. Please request a new one.");
+        }
+
+        user.setPassword(enc.encode(newPassword));
         user.setResetToken(null);
         user.setResetTokenExpiry(null);
-
         repo.save(user);
 
         Map<String, String> res = new HashMap<>();
         res.put("message", "Password reset successful");
-
         return ResponseEntity.ok(res);
     }
+
 }
