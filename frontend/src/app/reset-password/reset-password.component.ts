@@ -15,6 +15,8 @@ export class ResetPasswordComponent implements OnInit {
   errorMessage = '';
   loading = false;
   resetSuccessful = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private api: ApiService,

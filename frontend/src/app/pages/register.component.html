@@ -2,22 +2,47 @@
   <div class="col-md-5">
     <div class="card p-4">
       <h3>Register</h3>
+
       <input
         class="form-control my-2"
         placeholder="Username"
+        autocomplete="username"
         [(ngModel)]="username"
-      /><input
+      />
+
+      <input
         class="form-control my-2"
+        type="email"
         placeholder="Email"
+        autocomplete="email"
         [(ngModel)]="email"
-      /><input
-        class="form-control my-2"
-        type="password"
-        placeholder="Password"
-        [(ngModel)]="password"
-      /><button class="btn btn-success btn-block" (click)="register()">
+      />
+
+      <div class="password-field my-2">
+        <input
+          class="form-control"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          autocomplete="new-password"
+          [(ngModel)]="password"
+          (keyup.enter)="register()"
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="showPassword = !showPassword"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          [attr.title]="showPassword ? 'Hide password' : 'Show password'"
+        >
+          {{ showPassword ? '🙈' : '👁' }}
+        </button>
+      </div>
+
+      <button class="btn btn-success btn-block" type="button" (click)="register()">
         Create Account
       </button>
+
       <p class="text-danger mt-2">{{ err }}</p>
     </div>
   </div>

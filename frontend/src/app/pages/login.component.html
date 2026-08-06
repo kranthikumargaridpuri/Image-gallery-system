@@ -1,22 +1,43 @@
 <div class="row justify-content-center">
-    <div class="col-md-5">
-      <div class="card p-4">
-        <h3>Login</h3>
+  <div class="col-md-5">
+    <div class="card p-4">
+      <h3>Login</h3>
+
+      <input
+        class="form-control my-2"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+        [(ngModel)]="email"
+      />
+
+      <div class="password-field my-2">
         <input
-          class="form-control my-2"
-          placeholder="Email"
-          [(ngModel)]="email"
-        /><input
-          class="form-control my-2"
-          type="password"
+          class="form-control"
+          [type]="showPassword ? 'text' : 'password'"
           placeholder="Password"
+          autocomplete="current-password"
           [(ngModel)]="password"
-        /><button class="btn btn-primary btn-block" (click)="login()">
-          Login
+          (keyup.enter)="login()"
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="showPassword = !showPassword"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          [attr.title]="showPassword ? 'Hide password' : 'Show password'"
+        >
+          {{ showPassword ? '🙈' : '👁' }}
         </button>
-        <p class="text-danger mt-2">{{ err }}</p>
-       
-        <a routerLink="/forgot-password">Forgot Password?</a>
       </div>
+
+      <button class="btn btn-primary btn-block" type="button" (click)="login()">
+        Login
+      </button>
+
+      <p class="text-danger mt-2">{{ err }}</p>
+      <a routerLink="/forgot-password">Forgot Password?</a>
     </div>
   </div>
+</div>
