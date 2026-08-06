@@ -1,31 +1,52 @@
 <div class="site-wrapper">
-
   <header class="premium-header">
+    <a class="brand" routerLink="/" aria-label="Global Traders home">
+      <img src="assets/images/logo.png" class="top-logo" alt="Global Traders logo" />
+      <span class="brand-text">
+        <strong>GLOBAL</strong>
+        <strong>TRADERS</strong>
+      </span>
+    </a>
 
-    <div class="header-main">
-      <a class="brand" routerLink="/">
-        <img src="assets/images/logo.png" class="top-logo" />
-
-        <span class="brand-text">
-          <span>GLOBAL</span>
-          <span>TRADERS</span>
-        </span>
-      </a>
-
-      <nav class="menu">
-        <a routerLink="/">GALLERY</a>
-        <a routerLink="/cart" *ngIf="auth.loggedIn()">CART</a>
-        <a routerLink="/admin" *ngIf="auth.isAdmin()">ADMIN</a>
-        <a routerLink="/login" *ngIf="!auth.loggedIn()">LOGIN</a>
-        <a routerLink="/register" *ngIf="!auth.loggedIn()">REGISTER</a>
-        <a href="#" *ngIf="auth.loggedIn()" (click)="auth.logout()">LOGOUT</a>
-      </nav>
+    <div class="clock-strip" aria-label="International date and time">
+      <div class="clock-item">
+        <strong>INDIA</strong>
+        <span>{{ india.date }}</span>
+        <span>{{ india.time }}</span>
+      </div>
+      <div class="clock-item">
+        <strong>USA</strong>
+        <span>{{ usa.date }}</span>
+        <span>{{ usa.time }}</span>
+      </div>
+      <div class="clock-item">
+        <strong>UK</strong>
+        <span>{{ uk.date }}</span>
+        <span>{{ uk.time }}</span>
+      </div>
+      <div class="clock-item">
+        <strong>AUSTRALIA</strong>
+        <span>{{ australia.date }}</span>
+        <span>{{ australia.time }}</span>
+      </div>
+      <div class="clock-item">
+        <strong>KSA</strong>
+        <span>{{ ksa.date }}</span>
+        <span>{{ ksa.time }}</span>
+      </div>
     </div>
 
+    <nav class="account-menu" aria-label="Account navigation">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">GALLERY</a>
+      <a routerLink="/cart" *ngIf="auth.loggedIn()">CART</a>
+      <a routerLink="/admin" *ngIf="auth.isAdmin()">ADMIN</a>
+      <a routerLink="/login" *ngIf="!auth.loggedIn()">LOGIN</a>
+      <a routerLink="/register" *ngIf="!auth.loggedIn()">REGISTER</a>
+      <a href="#" *ngIf="auth.loggedIn()" (click)="auth.logout(); $event.preventDefault()">LOGOUT</a>
+    </nav>
   </header>
 
   <main class="main-body">
     <router-outlet></router-outlet>
   </main>
-
 </div>

@@ -1,160 +1,31 @@
-<div
-  class="top-banner"
-  style="
-    position: relative;
-    height: 105px;
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-  "
->
-  <!-- LARGE LEFT LOGO -->
-  <div
-    style="
-      position: absolute;
-      left: 58px;
-      top: 4px;
-      z-index: 20;
-    "
-  >
-    <img
-      src="assets/images/global-digipic-logo-4x6cm.jpeg"
-      alt="Global Digipic Logo"
-      class="main-logo"
-      style="
-        width: 118px;
-        height: 158px;
-        object-fit: contain;
-        display: block;
-        max-width: none;
-      "
-    />
-  </div>
+<section class="gallery-page">
+  <nav class="primary-menu" aria-label="Main navigation">
+    <button type="button" routerLink="/">HOME</button>
+    <button type="button">PRODUCT</button>
+    <button type="button">CERTIFICATES</button>
+    <button type="button">EVENTS</button>
+    <button type="button">MEDIA</button>
+    <button type="button">NEWS</button>
+    <button type="button">DOWNLOADS</button>
+    <button type="button">GALLERY</button>
+    <button type="button">CONTACT</button>
+  </nav>
 
-  <!-- COUNTRY TIME AND LOGIN -->
-  <div
-    class="row no-gutters align-items-center"
-    style="
-      height: 105px;
-      margin: 0 18px 0 300px;
-      padding: 0;
-    "
-  >
-    <div class="col-lg-9 col-md-12">
-      <div
-        class="country-time-row"
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: nowrap;
-          gap: 10px;
-          margin: 0;
-          padding: 0;
-        "
-      >
-        <div class="time-box">
-          <h5>INDIA</h5>
-          <p class="country-date">{{ indiaDate }}</p>
-          <p class="country-time">{{ indiaTime }}</p>
-        </div>
-
-        <div class="time-box">
-          <h5>USA</h5>
-          <p class="country-date">{{ usaDate }}</p>
-          <p class="country-time">{{ usaTime }}</p>
-        </div>
-
-        <div class="time-box">
-          <h5>UK</h5>
-          <p class="country-date">{{ ukDate }}</p>
-          <p class="country-time">{{ ukTime }}</p>
-        </div>
-
-        <div class="time-box">
-          <h5>AUSTRALIA</h5>
-          <p class="country-date">{{ australiaDate }}</p>
-          <p class="country-time">{{ australiaTime }}</p>
-        </div>
-
-        <div class="time-box">
-          <h5>KSA</h5>
-          <p class="country-date">{{ ksaDate }}</p>
-          <p class="country-time">{{ ksaTime }}</p>
-        </div>
+  <div class="content-grid">
+    <aside class="left-column">
+      <div class="promo-card">
+        <img
+          src="assets/images/global-digipic-logo-4x6cm.jpeg"
+          alt="Global Digipic services"
+        />
       </div>
-    </div>
-
-    <div class="col-lg-3 col-md-12 text-center">
-      <button
-        type="button"
-        class="login-glow-btn"
-        routerLink="/login"
-      >
-        LOGIN
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- MAIN MENU -->
-<div
-  class="menu-bar mb-3"
-  style="
-    margin-top: 0;
-    padding-left: 345px;
-  "
->
-  <button type="button" routerLink="/">
-    HOME
-  </button>
-
-  <button type="button">
-    PRODUCT
-  </button>
-
-  <button type="button">
-    CERTIFICATES
-  </button>
-
-  <button type="button">
-    EVENTS
-  </button>
-
-  <button type="button">
-    MEDIA
-  </button>
-
-  <button type="button">
-    NEWS
-  </button>
-
-  <button type="button">
-    DOWNLOADS
-  </button>
-
-  <button type="button">
-    GALLERY
-  </button>
-
-  <button type="button">
-    CONTACT
-  </button>
-</div>
-
-<div class="container-fluid">
-  <div class="row">
-
-    <!-- LEFT SIDEBAR -->
-    <div class="col-lg-2 col-md-3 mb-3">
 
       <div class="sidebar-box">
-
-        <h5>ALL DESIGNS</h5>
+        <h2>ALL DESIGNS</h2>
 
         <button
           type="button"
-          class="btn btn-outline-primary btn-block mb-2"
+          class="category-btn active-category"
           (click)="load()"
         >
           All Images
@@ -162,7 +33,7 @@
 
         <button
           type="button"
-          class="btn btn-outline-secondary btn-block mb-2"
+          class="category-btn"
           *ngFor="let c of categories"
           (click)="cat(c.id)"
         >
@@ -171,7 +42,7 @@
 
         <button
           type="button"
-          class="btn btn-outline-secondary btn-block mb-2"
+          class="category-btn"
           routerLink="/login"
         >
           Login User
@@ -179,110 +50,99 @@
 
         <button
           type="button"
-          class="btn btn-outline-secondary btn-block mb-2"
+          class="category-btn"
           routerLink="/admin"
         >
           Admin
         </button>
-
       </div>
+    </aside>
 
-    </div>
-
-    <!-- CENTER CONTENT -->
-    <div class="col-lg-8 col-md-9">
-
-      <!-- SEARCH -->
-      <div class="search-premium mb-4">
-
+    <main class="center-column">
+      <div class="search-premium">
         <input
           type="text"
-          class="form-control search-input"
+          class="search-input"
           placeholder="Search Premium Designs..."
           [(ngModel)]="keyword"
-          (input)="search()"
+          (keyup.enter)="search()"
         />
 
         <button
           type="button"
-          class="btn btn-warning search-btn"
+          class="search-btn"
           (click)="search()"
         >
           Search
         </button>
-
       </div>
 
-      <!-- IMAGE GALLERY -->
-      <div class="image-panel">
-
-        <div class="row">
-
-          <div
-            class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-12 mb-4"
+      <section class="image-panel" aria-live="polite">
+        <div
+          class="image-grid"
+          *ngIf="images && images.length > 0"
+        >
+          <article
+            class="image-card"
             *ngFor="let img of images"
           >
+            <img
+              class="gallery-img"
+              [src]="
+                img?.imageUrl
+                  ? api.imageUrl(img.imageUrl)
+                  : 'assets/images/global-digipic-logo-4x6cm.jpeg'
+              "
+              [alt]="img?.name || 'Gallery Image'"
+            />
 
-            <div class="card image-card h-100 shadow-sm">
+            <div class="image-card-body">
+              <h3>
+                {{ img?.name || 'Image Name' }}
+              </h3>
 
-              <img
-                class="gallery-img img-fluid"
-                [src]="
-                  img?.imageUrl
-                    ? api.imageUrl(img.imageUrl)
-                    : 'assets/images/global-digipic-logo-4x6cm.jpeg'
-                "
-                [alt]="img?.name || 'Gallery Image'"
-              />
+              <p class="image-code">
+                <strong>Code:</strong>
+                {{ img?.imageCode || 'Not Generated' }}
+              </p>
 
-              <div class="card-body p-2 text-center">
+              <p class="price-text">
+                Cost: ₹{{ img?.cost || 0 }}
+              </p>
 
-                <h5 class="image-name">
-                  {{ img?.name || 'Image Name' }}
-                </h5>
+              <button
+                type="button"
+                class="card-action preview-action"
+                *ngIf="img?.imageCode"
+                (click)="viewImage(img.imageCode)"
+              >
+                Preview
+              </button>
 
-                <p class="image-code">
-                  <b>Code:</b>
-                  {{ img?.imageCode || 'Not Generated' }}
-                </p>
-
-                <p class="price-text">
-                  Cost: ₹{{ img?.cost || 0 }}
-                </p>
-
-                <button
-                  type="button"
-                  class="btn view-btn btn-sm btn-block mt-2"
-                  *ngIf="img?.imageCode"
-                  (click)="viewImage(img.imageCode)"
-                >
-                  Preview
-                </button>
-
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm btn-block mt-2"
-                  *ngIf="auth.loggedIn() && img?.id"
-                  (click)="add(img.id)"
-                >
-                  Add to Cart
-                </button>
-
-              </div>
-
+              <button
+                type="button"
+                class="card-action cart-action"
+                *ngIf="auth.loggedIn() && img?.id"
+                (click)="add(img.id)"
+              >
+                Add to Cart
+              </button>
             </div>
-
-          </div>
-
+          </article>
         </div>
 
-        <!-- EMPTY STATE -->
         <div
-          class="text-center py-5"
+          class="empty-state"
           *ngIf="!images || images.length === 0"
         >
+          <div
+            class="empty-icon"
+            aria-hidden="true"
+          >
+            ▧
+          </div>
 
-          <h5>No designs found</h5>
+          <h2>No designs found</h2>
 
           <p>
             Try another keyword or select a different category.
@@ -290,124 +150,82 @@
 
           <button
             type="button"
-            class="btn btn-primary"
             (click)="load()"
           >
             View All Images
           </button>
-
         </div>
+      </section>
+    </main>
 
-      </div>
-
-    </div>
-
-    <!-- RIGHT PAYMENT SIDEBAR -->
-    <div class="col-lg-2 col-md-12">
-
+    <aside class="payment-column">
       <div class="payment-box">
-
-        <!-- QR IMAGE -->
-        <div class="qr-box">
-
-          <img
-            src="assets/images/payment-qr.jpeg"
-            alt="Global Traders UPI Payment QR Code"
-            class="payment-qr-image"
-          />
-
-        </div>
-
-        <p class="small mt-2 mb-2">
-          Scan and Pay Instantly
+        <p class="pay-to">
+          Pay to
         </p>
 
+        <h2>
+          GLOBAL TRADERS
+        </h2>
+
+        <div class="qr-box">
+          <img
+            src="assets/images/payment-qr.jpeg"
+            alt="Global Traders UPI payment QR code"
+            class="payment-qr-image"
+          />
+        </div>
+
         <div class="upi-details">
-
-          <span>UPI ID</span>
-
+          <span>UPI ID:</span>
           <strong>
             gdpkki.traders5696@kotak
           </strong>
-
         </div>
 
-        <h5 class="whatsapp-title">
-          WhatsApp
-        </h5>
-
-        <a
-          class="whatsapp-no"
-          href="https://wa.me/919281495696"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          9281495696
-        </a>
-
-        <a
-          class="btn btn-success btn-sm btn-block mt-3"
-          href="https://wa.me/919281495696"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Send Payment Screenshot
-        </a>
-
+        <p class="scan-text">
+          Scan and Pay Instantly
+        </p>
       </div>
-
-    </div>
-
+    </aside>
   </div>
-</div>
 
-<!-- SECURE INFORMATION -->
-<div class="secure-footer mt-4">
-
-  <span class="secure-bold">
-    We are 100% Secure.
-  </span>
-
-  <span>
-    Send the item code and payment screenshot through WhatsApp.
-    We will transfer the purchased file to the same WhatsApp number.
-  </span>
-
-</div>
-
-<!-- MAIN FOOTER -->
-<div class="main-footer">
-
-  <div class="footer-contact">
-
-    <span>Support:</span>
-
-    <a href="mailto:admin@asprineminds.com">
-      admin@asprineminds.com
-    </a>
-
-    <span class="footer-separator">
-      /
-    </span>
-
-    <span>Cell:</span>
-
-    <a href="tel:+919281495696">
-      +91 9281495696
-    </a>
-
-    <span class="footer-separator">
-      /
-    </span>
+  <div class="secure-footer">
+    <strong>
+      We are 100% Secure.
+    </strong>
 
     <span>
-      Andhra Pradesh, INDIA
+      Send the item code and payment screenshot through WhatsApp.
+      We will transfer the purchased file to the same WhatsApp number.
     </span>
-
   </div>
 
-  <div class="footer-rights">
-    All Rights Reserved by Asprine Minds
-  </div>
+  <footer class="main-footer">
+    <div class="footer-contact">
+      <span>Support:</span>
 
-</div>
+      <a href="mailto:admin@asprineminds.com">
+        admin@asprineminds.com
+      </a>
+
+      <span class="divider">|</span>
+
+      <span>Cell:</span>
+
+      <a href="tel:+919281495696">
+        +91 9281495696
+      </a>
+
+      <span class="divider">|</span>
+
+      <span>
+        Andhra Pradesh, INDIA
+      </span>
+    </div>
+
+    <div class="footer-rights">
+      © 2026 AsprineMinds . All Rights Reserved.
+    </div>
+  </footer>
+</section>
