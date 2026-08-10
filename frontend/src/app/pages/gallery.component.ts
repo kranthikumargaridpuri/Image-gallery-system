@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ApiService } from "../services/api.service";
 import { AuthService } from "../services/auth.service";
 
@@ -28,9 +29,12 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
   private clockInterval: any;
 
+  private pdfPreviewCache: { [url: string]: SafeResourceUrl } = {};
+
   constructor(
     public api: ApiService,
-    public auth: AuthService
+    public auth: AuthService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -173,6 +177,32 @@ export class GalleryComponent implements OnInit, OnDestroy {
         alert("Unable to add item to cart");
       }
     );
+  }
+
+
+  isPdf(path: string): boolean {
+    if (!path) {
+      return false;
+    }
+
+    const cleanPath = path.split("?")[0].split("#")[0].toLowerCase();
+    return cleanPath.endsWith(".pdf");
+  }
+
+  pdfPreviewUrl(path: string): SafeResourceUrl {
+    if (!path) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
+    }
+
+    const absoluteUrl = this.api.imageUrl(path);
+    const previewUrl = absoluteUrl + "#page=1&zoom=page-width&toolbar=0&navpanes=0&scrollbar=0";
+
+    if (!this.pdfPreviewCache[previewUrl]) {
+      this.pdfPreviewCache[previewUrl] =
+        this.sanitizer.bypassSecurityTrustResourceUrl(previewUrl);
+    }
+
+    return this.pdfPreviewCache[previewUrl];
   }
 
   viewImage(code: string): void {

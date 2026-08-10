@@ -173,11 +173,41 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
+.gallery-preview-frame {
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  position: relative;
+  background: #f3f5f8;
+}
+
 .gallery-img {
   width: 100%;
   height: 210px;
   display: block;
   object-fit: cover;
+}
+
+.gallery-pdf-preview {
+  width: 100%;
+  height: 210px;
+  display: block;
+  border: 0;
+  background: #fff;
+  pointer-events: none;
+}
+
+.gallery-missing-preview {
+  width: 100%;
+  height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #6b7280;
+  font-size: 13px;
+  text-align: center;
+  background: #f3f5f8;
 }
 
 .image-card-body {
