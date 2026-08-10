@@ -17,11 +17,25 @@
     <div class="col-lg-4 col-md-12 mb-3 text-center">
       <div class="card preview-card p-3 shadow">
         <img
-          *ngIf="image?.imageUrl"
+          *ngIf="image?.imageUrl && !isPdf(image.imageUrl)"
           [src]="api.imageUrl(image.imageUrl)"
           [alt]="image?.name || 'Image preview'"
           class="preview-img"
         />
+
+        <iframe
+          *ngIf="image?.imageUrl && isPdf(image.imageUrl) && pdfPreviewSrc"
+          [src]="pdfPreviewSrc"
+          [title]="(image?.name || 'PDF') + ' preview'"
+          class="preview-pdf"
+        ></iframe>
+
+        <div
+          *ngIf="!image?.imageUrl"
+          class="preview-unavailable"
+        >
+          Preview not available
+        </div>
       </div>
     </div>
 
