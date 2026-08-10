@@ -195,7 +195,9 @@ export class GalleryComponent implements OnInit, OnDestroy {
     }
 
     const absoluteUrl = this.api.imageUrl(path);
-    const previewUrl = absoluteUrl + "#page=1&zoom=page-width&toolbar=0&navpanes=0&scrollbar=0";
+    const previewUrl =
+      absoluteUrl +
+      "#page=1&zoom=page-fit&toolbar=0&navpanes=0&scrollbar=0";
 
     if (!this.pdfPreviewCache[previewUrl]) {
       this.pdfPreviewCache[previewUrl] =
