@@ -88,33 +88,19 @@
           >
             <div class="file-preview">
               <!--
-                Do NOT load every PDF viewer when the gallery opens.
-                Multiple browser PDF viewers are heavy and their native dark
-                canvas creates the black areas visible between PDF pages.
-                The PDF is loaded only when the user asks for it.
+                PDF pages are rendered directly on white canvases with PDF.js.
+                This avoids the browser PDF plug-in's dark/black area after
+                short or single-page documents. Previews load automatically
+                when a PDF card approaches the viewport; there is no button.
               -->
               <div
-                *ngIf="isPdf(img?.imageUrl) && !isPdfPreviewLoaded(img)"
-                class="pdf-placeholder"
+                *ngIf="isPdf(img?.imageUrl)"
+                class="gallery-pdf-preview pdf-js-preview"
+                [attr.data-pdf-key]="getPdfKey(img)"
+                [attr.data-pdf-url]="api.imageUrl(img?.imageUrl)"
               >
-                <div class="pdf-badge">PDF</div>
-                <strong>PDF Document</strong>
-                <span>Load only when required</span>
-                <button
-                  type="button"
-                  class="load-pdf-btn"
-                  (click)="loadPdfPreview(img)"
-                >
-                  Load PDF Preview
-                </button>
+                <div class="pdf-loading">Loading PDF…</div>
               </div>
-
-              <iframe
-                *ngIf="isPdf(img?.imageUrl) && isPdfPreviewLoaded(img)"
-                class="gallery-pdf-preview"
-                [src]="safeFileUrl(img?.imageUrl)"
-                [title]="img?.name || 'PDF Preview'"
-              ></iframe>
 
               <img
                 *ngIf="!isPdf(img?.imageUrl)"
