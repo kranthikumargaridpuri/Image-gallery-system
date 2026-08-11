@@ -4,7 +4,7 @@
 
 .gallery-page {
   width: 100%;
-  min-height: calc(100vh - 118px);
+  min-height: calc(100vh - 88px);
   padding: 22px 18px 0;
   color: #fff;
 }
@@ -161,8 +161,8 @@
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .image-card {
@@ -173,43 +173,31 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
-.gallery-preview-frame {
+.file-preview {
   width: 100%;
-  height: 210px;
-  overflow: hidden;
-  position: relative;
-  background: #f3f5f8;
+  height: 245px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fff;
+  border-bottom: 1px solid #ececec;
+  scrollbar-width: thin;
 }
 
 .gallery-img {
   width: 100%;
-  height: 210px;
+  height: auto;
+  min-height: 100%;
   display: block;
   object-fit: contain;
-  background: #ffffff;
+  background: #fff;
 }
 
 .gallery-pdf-preview {
   width: 100%;
-  height: 210px;
+  height: 700px;
   display: block;
   border: 0;
-  overflow: hidden;
-  background: #ffffff;
-  pointer-events: none;
-}
-
-.gallery-missing-preview {
-  width: 100%;
-  height: 210px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  color: #6b7280;
-  font-size: 13px;
-  text-align: center;
-  background: #f3f5f8;
+  background: #fff;
 }
 
 .image-card-body {
@@ -219,7 +207,8 @@
 
 .image-card-body h3 {
   margin: 0 0 8px;
-  font-size: 15px;
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 .image-code,
@@ -405,6 +394,12 @@
   font-size: 13px;
 }
 
+@media (max-width: 1500px) {
+  .image-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1200px) {
   .content-grid {
     grid-template-columns: 200px minmax(0, 1fr);
@@ -421,7 +416,7 @@
   }
 
   .image-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -527,7 +522,25 @@
   }
 
   .image-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .file-preview {
+    height: 190px;
+  }
+
+  .image-card-body {
+    padding: 9px 7px;
+  }
+
+  .image-card-body h3 {
+    font-size: 12px;
+  }
+
+  .image-code,
+  .price-text {
+    font-size: 11px;
   }
 
   .empty-state {
@@ -559,5 +572,15 @@
 
   .divider {
     display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .file-preview {
+    height: 230px;
   }
 }

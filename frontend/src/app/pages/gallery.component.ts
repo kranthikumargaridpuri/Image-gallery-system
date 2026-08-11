@@ -29,8 +29,6 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
   private clockInterval: any;
 
-  private pdfPreviewCache: { [url: string]: SafeResourceUrl } = {};
-
   constructor(
     public api: ApiService,
     public auth: AuthService,
@@ -179,32 +177,18 @@ export class GalleryComponent implements OnInit, OnDestroy {
     );
   }
 
-
-  isPdf(path: string): boolean {
-    if (!path) {
-      return false;
-    }
-
-    const cleanPath = path.split("?")[0].split("#")[0].toLowerCase();
-    return cleanPath.endsWith(".pdf");
+  isPdf(fileUrl: string): boolean {
+    return !!fileUrl && fileUrl.toLowerCase().split("?")[0].endsWith(".pdf");
   }
 
-  pdfPreviewUrl(path: string): SafeResourceUrl {
-    if (!path) {
+  safeFileUrl(fileUrl: string): SafeResourceUrl {
+    if (!fileUrl) {
       return this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
     }
 
-    const absoluteUrl = this.api.imageUrl(path);
-    const previewUrl =
-      absoluteUrl +
-      "#page=1&zoom=page-fit&toolbar=0&navpanes=0&scrollbar=0";
-
-    if (!this.pdfPreviewCache[previewUrl]) {
-      this.pdfPreviewCache[previewUrl] =
-        this.sanitizer.bypassSecurityTrustResourceUrl(previewUrl);
-    }
-
-    return this.pdfPreviewCache[previewUrl];
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      this.api.imageUrl(fileUrl)
+    );
   }
 
   viewImage(code: string): void {

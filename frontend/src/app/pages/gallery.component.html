@@ -86,29 +86,24 @@
             class="image-card"
             *ngFor="let img of images"
           >
-            <div class="gallery-preview-frame">
-              <img
-                *ngIf="img?.imageUrl && !isPdf(img.imageUrl)"
-                class="gallery-img"
-                [src]="api.imageUrl(img.imageUrl)"
-                [alt]="img?.name || 'Gallery Image'"
-              />
-
+            <div class="file-preview">
               <iframe
-                *ngIf="img?.imageUrl && isPdf(img.imageUrl)"
+                *ngIf="isPdf(img?.imageUrl)"
                 class="gallery-pdf-preview"
-                [src]="pdfPreviewUrl(img.imageUrl)"
-                [title]="(img?.name || 'PDF design') + ' preview'"
-                loading="lazy"
-                tabindex="-1"
+                [src]="safeFileUrl(img?.imageUrl)"
+                [title]="img?.name || 'PDF Preview'"
               ></iframe>
 
-              <div
-                *ngIf="!img?.imageUrl"
-                class="gallery-missing-preview"
-              >
-                Preview not available
-              </div>
+              <img
+                *ngIf="!isPdf(img?.imageUrl)"
+                class="gallery-img"
+                [src]="
+                  img?.imageUrl
+                    ? api.imageUrl(img.imageUrl)
+                    : 'assets/images/global-digipic-logo-4x6cm.jpeg'
+                "
+                [alt]="img?.name || 'Gallery Image'"
+              />
             </div>
 
             <div class="image-card-body">
