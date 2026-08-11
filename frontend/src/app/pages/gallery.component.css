@@ -180,7 +180,7 @@
   height: 245px;
   overflow-x: hidden;
   overflow-y: auto;
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid #ececec;
   scrollbar-width: thin;
 }
@@ -191,62 +191,47 @@
   min-height: 100%;
   display: block;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
 }
 
 .gallery-pdf-preview {
   width: 100%;
-  height: 700px;
+  min-height: 100%;
   display: block;
-  border: 0;
-  background: #fff;
+  overflow: visible;
+  background: #ffffff;
 }
 
-.pdf-placeholder {
+.pdf-canvas-preview {
+  background: #ffffff;
+}
+
+.pdf-page-canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  margin: 0;
+  padding: 0;
+  background: #ffffff !important;
+}
+
+.pdf-page-canvas + .pdf-page-canvas {
+  border-top: 4px solid #ffffff;
+}
+
+.pdf-loading,
+.pdf-error {
   width: 100%;
-  height: 100%;
   min-height: 245px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7px;
   padding: 14px;
-  color: #26334d;
-  text-align: center;
-  background: linear-gradient(180deg, #ffffff 0%, #f2f6fb 100%);
-}
-
-.pdf-placeholder span {
-  color: #6c7687;
-  font-size: 11px;
-}
-
-.pdf-badge {
-  min-width: 52px;
-  padding: 8px 10px;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  background: #d83232;
-  border-radius: 8px;
-}
-
-.load-pdf-btn {
-  margin-top: 4px;
-  padding: 7px 10px;
-  color: #fff;
-  font-size: 11px;
+  color: #64748b;
+  font-size: 12px;
   font-weight: 700;
-  background: #087bf0;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.load-pdf-btn:hover {
-  filter: brightness(1.08);
+  text-align: center;
+  background: #ffffff;
 }
 
 .image-card-body {

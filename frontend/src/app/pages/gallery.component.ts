@@ -1,39 +1,44 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import {
+  AfterViewChecked,
+  Component,
+  OnDestroy,
+  OnInit
+} from "@angular/core";
 import { ApiService } from "../services/api.service";
 import { AuthService } from "../services/auth.service";
+
+declare const pdfjsLib: any;
 
 @Component({
   templateUrl: "./gallery.component.html",
   styleUrls: ["./gallery.component.css"]
 })
-export class GalleryComponent implements OnInit, OnDestroy {
+export class GalleryComponent
+  implements OnInit, OnDestroy, AfterViewChecked {
   images: any[] = [];
   categories: any[] = [];
   keyword = "";
 
   indiaDate = "";
   indiaTime = "";
-
   usaDate = "";
   usaTime = "";
-
   ukDate = "";
   ukTime = "";
-
   australiaDate = "";
   australiaTime = "";
-
   ksaDate = "";
   ksaTime = "";
 
   private clockInterval: any;
-  private loadedPdfPreviews: { [key: string]: boolean } = {};
+  private pdfScriptPromise: Promise<any> | null = null;
+  private renderedPdfKeys: { [key: string]: boolean } = {};
+  private renderingPdfKeys: { [key: string]: boolean } = {};
+  private pdfObserver: IntersectionObserver | null = null;
 
   constructor(
     public api: ApiService,
-    public auth: AuthService,
-    private sanitizer: DomSanitizer
+    public auth: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -50,38 +55,42 @@ export class GalleryComponent implements OnInit, OnDestroy {
     );
 
     this.updateDateAndTimes();
-
     this.clockInterval = setInterval(() => {
       this.updateDateAndTimes();
     }, 1000);
+  }
+
+  ngAfterViewChecked(): void {
+    this.observePdfPreviews();
   }
 
   ngOnDestroy(): void {
     if (this.clockInterval) {
       clearInterval(this.clockInterval);
     }
+
+    if (this.pdfObserver) {
+      this.pdfObserver.disconnect();
+      this.pdfObserver = null;
+    }
   }
 
   updateDateAndTimes(): void {
     const now = new Date();
-
     const india = this.getDateAndTime(now, "Asia/Kolkata");
+    const usa = this.getDateAndTime(now, "America/New_York");
+    const uk = this.getDateAndTime(now, "Europe/London");
+    const australia = this.getDateAndTime(now, "Australia/Sydney");
+    const ksa = this.getDateAndTime(now, "Asia/Riyadh");
+
     this.indiaDate = india.date;
     this.indiaTime = india.time;
-
-    const usa = this.getDateAndTime(now, "America/New_York");
     this.usaDate = usa.date;
     this.usaTime = usa.time;
-
-    const uk = this.getDateAndTime(now, "Europe/London");
     this.ukDate = uk.date;
     this.ukTime = uk.time;
-
-    const australia = this.getDateAndTime(now, "Australia/Sydney");
     this.australiaDate = australia.date;
     this.australiaTime = australia.time;
-
-    const ksa = this.getDateAndTime(now, "Asia/Riyadh");
     this.ksaDate = ksa.date;
     this.ksaTime = ksa.time;
   }
@@ -90,29 +99,26 @@ export class GalleryComponent implements OnInit, OnDestroy {
     currentDate: Date,
     timeZone: string
   ): { date: string; time: string } {
-    const date = currentDate.toLocaleDateString("en-GB", {
-      timeZone,
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    });
-
-    const time = currentDate.toLocaleTimeString("en-US", {
-      timeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    });
-
     return {
-      date,
-      time
+      date: currentDate.toLocaleDateString("en-GB", {
+        timeZone,
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }),
+      time: currentDate.toLocaleTimeString("en-US", {
+        timeZone,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      })
     };
   }
 
   load(): void {
     this.keyword = "";
+    this.resetPdfRendering();
 
     this.api.images().subscribe(
       (response) => {
@@ -126,15 +132,13 @@ export class GalleryComponent implements OnInit, OnDestroy {
   }
 
   search(): void {
-    const normalizedKeyword = this.keyword
-      ? this.keyword.trim()
-      : "";
-
+    const normalizedKeyword = this.keyword ? this.keyword.trim() : "";
     if (!normalizedKeyword) {
       this.load();
       return;
     }
 
+    this.resetPdfRendering();
     this.api.search(normalizedKeyword).subscribe(
       (response) => {
         this.images = response || [];
@@ -151,6 +155,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.resetPdfRendering();
     this.api.byCategory(id).subscribe(
       (response) => {
         this.images = response || [];
@@ -168,9 +173,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
     }
 
     this.api.addCart(id).subscribe(
-      () => {
-        alert("Added to cart");
-      },
+      () => alert("Added to cart"),
       (error) => {
         console.error("Unable to add image to cart", error);
         alert("Unable to add item to cart");
@@ -182,39 +185,11 @@ export class GalleryComponent implements OnInit, OnDestroy {
     return !!fileUrl && fileUrl.toLowerCase().split("?")[0].endsWith(".pdf");
   }
 
-  private getPdfKey(img: any): string {
+  getPdfKey(img: any): string {
     if (!img) {
       return "";
     }
-
     return String(img.id || img.imageCode || img.imageUrl || "");
-  }
-
-  isPdfPreviewLoaded(img: any): boolean {
-    const key = this.getPdfKey(img);
-    return !!key && !!this.loadedPdfPreviews[key];
-  }
-
-  loadPdfPreview(img: any): void {
-    const key = this.getPdfKey(img);
-
-    if (key) {
-      this.loadedPdfPreviews[key] = true;
-    }
-  }
-
-  safeFileUrl(fileUrl: string): SafeResourceUrl {
-    if (!fileUrl) {
-      return this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
-    }
-
-    const url = this.api.imageUrl(fileUrl);
-    const viewerUrl =
-      url +
-      (url.indexOf("#") === -1 ? "#" : "&") +
-      "toolbar=0&navpanes=0&scrollbar=1&view=FitH";
-
-    return this.sanitizer.bypassSecurityTrustResourceUrl(viewerUrl);
   }
 
   trackByImage(index: number, img: any): any {
@@ -236,8 +211,143 @@ export class GalleryComponent implements OnInit, OnDestroy {
     if (!code) {
       return;
     }
+    window.location.href = "/image-preview/" + encodeURIComponent(code);
+  }
 
-    window.location.href =
-      "/image-preview/" + encodeURIComponent(code);
+  private resetPdfRendering(): void {
+    this.renderedPdfKeys = {};
+    this.renderingPdfKeys = {};
+    if (this.pdfObserver) {
+      this.pdfObserver.disconnect();
+      this.pdfObserver = null;
+    }
+  }
+
+  private observePdfPreviews(): void {
+    const nodes = Array.prototype.slice.call(
+      document.querySelectorAll(".pdf-canvas-preview")
+    ) as HTMLElement[];
+
+    if (!nodes.length) {
+      return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach((node) => this.renderPdfElement(node));
+      return;
+    }
+
+    if (!this.pdfObserver) {
+      this.pdfObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const element = entry.target as HTMLElement;
+              this.pdfObserver!.unobserve(element);
+              this.renderPdfElement(element);
+            }
+          });
+        },
+        { rootMargin: "500px 0px" }
+      );
+    }
+
+    nodes.forEach((node) => {
+      const key = node.getAttribute("data-pdf-key") || "";
+      if (!this.renderedPdfKeys[key] && !this.renderingPdfKeys[key]) {
+        this.pdfObserver!.observe(node);
+      }
+    });
+  }
+
+  private loadPdfJs(): Promise<any> {
+    if ((window as any).pdfjsLib) {
+      const lib = (window as any).pdfjsLib;
+      lib.GlobalWorkerOptions.workerSrc = "assets/pdfjs/pdf.worker.min.js";
+      return Promise.resolve(lib);
+    }
+
+    if (this.pdfScriptPromise) {
+      return this.pdfScriptPromise;
+    }
+
+    this.pdfScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "assets/pdfjs/pdf.min.js";
+      script.async = true;
+      script.onload = () => {
+        const lib = (window as any).pdfjsLib;
+        if (!lib) {
+          reject(new Error("PDF.js did not initialize"));
+          return;
+        }
+        lib.GlobalWorkerOptions.workerSrc = "assets/pdfjs/pdf.worker.min.js";
+        resolve(lib);
+      };
+      script.onerror = () => reject(new Error("Unable to load local PDF.js"));
+      document.head.appendChild(script);
+    });
+
+    return this.pdfScriptPromise;
+  }
+
+  private async renderPdfElement(element: HTMLElement): Promise<void> {
+    const key = element.getAttribute("data-pdf-key") || "";
+    const url = element.getAttribute("data-pdf-url") || "";
+
+    if (!key || !url || this.renderedPdfKeys[key] || this.renderingPdfKeys[key]) {
+      return;
+    }
+
+    this.renderingPdfKeys[key] = true;
+
+    try {
+      const lib = await this.loadPdfJs();
+      const loadingTask = lib.getDocument({ url: url });
+      const pdf = await loadingTask.promise;
+
+      element.innerHTML = "";
+      const availableWidth = Math.max(element.clientWidth - 4, 120);
+
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = availableWidth / baseViewport.width;
+        const viewport = page.getViewport({ scale: scale });
+
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d", { alpha: false }) as CanvasRenderingContext2D;
+        const outputScale = Math.min(window.devicePixelRatio || 1, 1.5);
+
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+        canvas.style.width = Math.floor(viewport.width) + "px";
+        canvas.style.height = Math.floor(viewport.height) + "px";
+        canvas.className = "pdf-page-canvas";
+
+        context.save();
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.restore();
+
+        element.appendChild(canvas);
+
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+          transform: outputScale !== 1
+            ? [outputScale, 0, 0, outputScale, 0, 0]
+            : null,
+          background: "rgb(255,255,255)"
+        }).promise;
+      }
+
+      this.renderedPdfKeys[key] = true;
+    } catch (error) {
+      console.error("Unable to render PDF preview", url, error);
+      element.innerHTML = '<div class="pdf-error">PDF preview unavailable</div>';
+    } finally {
+      delete this.renderingPdfKeys[key];
+    }
   }
 }
