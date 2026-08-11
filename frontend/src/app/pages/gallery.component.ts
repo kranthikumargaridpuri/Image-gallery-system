@@ -1,4 +1,5 @@
-import { AfterViewChecked, Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ApiService } from "../services/api.service";
 import { AuthService } from "../services/auth.service";
 
@@ -6,7 +7,7 @@ import { AuthService } from "../services/auth.service";
   templateUrl: "./gallery.component.html",
   styleUrls: ["./gallery.component.css"]
 })
-export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class GalleryComponent implements OnInit, OnDestroy {
   images: any[] = [];
   categories: any[] = [];
   keyword = "";
@@ -27,15 +28,12 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
   ksaTime = "";
 
   private clockInterval: any;
-  private pdfObserver: IntersectionObserver | null = null;
-  private observedPdfKeys: { [key: string]: boolean } = {};
-  private renderedPdfKeys: { [key: string]: boolean } = {};
-  private renderingPdfKeys: { [key: string]: boolean } = {};
-  private pdfJsPromise: Promise<any> | null = null;
+  private loadedPdfPreviews: { [key: string]: boolean } = {};
 
   constructor(
     public api: ApiService,
-    public auth: AuthService
+    public auth: AuthService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -58,18 +56,9 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
     }, 1000);
   }
 
-  ngAfterViewChecked(): void {
-    this.setupPdfAutoPreview();
-  }
-
   ngOnDestroy(): void {
     if (this.clockInterval) {
       clearInterval(this.clockInterval);
-    }
-
-    if (this.pdfObserver) {
-      this.pdfObserver.disconnect();
-      this.pdfObserver = null;
     }
   }
 
@@ -128,7 +117,6 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.api.images().subscribe(
       (response) => {
         this.images = response || [];
-        this.resetPdfPreviewTracking();
       },
       (error) => {
         console.error("Unable to load images", error);
@@ -150,7 +138,6 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.api.search(normalizedKeyword).subscribe(
       (response) => {
         this.images = response || [];
-        this.resetPdfPreviewTracking();
       },
       (error) => {
         console.error("Unable to search images", error);
@@ -167,7 +154,6 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.api.byCategory(id).subscribe(
       (response) => {
         this.images = response || [];
-        this.resetPdfPreviewTracking();
       },
       (error) => {
         console.error("Unable to load category images", error);
@@ -196,7 +182,7 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
     return !!fileUrl && fileUrl.toLowerCase().split("?")[0].endsWith(".pdf");
   }
 
-  getPdfKey(img: any): string {
+  private getPdfKey(img: any): string {
     if (!img) {
       return "";
     }
@@ -204,173 +190,31 @@ export class GalleryComponent implements OnInit, OnDestroy, AfterViewChecked {
     return String(img.id || img.imageCode || img.imageUrl || "");
   }
 
-  private resetPdfPreviewTracking(): void {
-    if (this.pdfObserver) {
-      this.pdfObserver.disconnect();
-      this.pdfObserver = null;
-    }
-
-    this.observedPdfKeys = {};
-    this.renderedPdfKeys = {};
-    this.renderingPdfKeys = {};
+  isPdfPreviewLoaded(img: any): boolean {
+    const key = this.getPdfKey(img);
+    return !!key && !!this.loadedPdfPreviews[key];
   }
 
-  private setupPdfAutoPreview(): void {
-    const elements = Array.prototype.slice.call(
-      document.querySelectorAll(".pdf-js-preview[data-pdf-key]")
-    ) as HTMLElement[];
+  loadPdfPreview(img: any): void {
+    const key = this.getPdfKey(img);
 
-    if (!elements.length) {
-      return;
+    if (key) {
+      this.loadedPdfPreviews[key] = true;
     }
-
-    if (!("IntersectionObserver" in window)) {
-      elements.forEach((element) => this.renderPdfElement(element));
-      return;
-    }
-
-    if (!this.pdfObserver) {
-      this.pdfObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const element = entry.target as HTMLElement;
-              this.renderPdfElement(element);
-
-              if (this.pdfObserver) {
-                this.pdfObserver.unobserve(element);
-              }
-            }
-          });
-        },
-        {
-          root: null,
-          rootMargin: "700px 0px",
-          threshold: 0.01
-        }
-      );
-    }
-
-    elements.forEach((element) => {
-      const key = element.getAttribute("data-pdf-key") || "";
-
-      if (!key || this.observedPdfKeys[key] || this.renderedPdfKeys[key]) {
-        return;
-      }
-
-      this.observedPdfKeys[key] = true;
-      this.pdfObserver!.observe(element);
-    });
   }
 
-  private loadPdfJs(): Promise<any> {
-    const globalWindow = window as any;
-
-    if (globalWindow.pdfjsLib) {
-      return Promise.resolve(globalWindow.pdfjsLib);
+  safeFileUrl(fileUrl: string): SafeResourceUrl {
+    if (!fileUrl) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
     }
 
-    if (this.pdfJsPromise) {
-      return this.pdfJsPromise;
-    }
+    const url = this.api.imageUrl(fileUrl);
+    const viewerUrl =
+      url +
+      (url.indexOf("#") === -1 ? "#" : "&") +
+      "toolbar=0&navpanes=0&scrollbar=1&view=FitH";
 
-    this.pdfJsPromise = new Promise((resolve, reject) => {
-      // Native dynamic import is deliberately created at runtime so the old
-      // Angular 8/Webpack build does not try to bundle the modern .mjs file.
-      const dynamicImport = new Function("url", "return import(url);") as any;
-
-      dynamicImport(
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs"
-      )
-        .then((pdfjsLib: any) => {
-          pdfjsLib.GlobalWorkerOptions.workerSrc =
-            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.mjs";
-
-          globalWindow.pdfjsLib = pdfjsLib;
-          resolve(pdfjsLib);
-        })
-        .catch(reject);
-    });
-
-    return this.pdfJsPromise;
-  }
-
-  private async renderPdfElement(element: HTMLElement): Promise<void> {
-    const key = element.getAttribute("data-pdf-key") || "";
-    const pdfUrl = element.getAttribute("data-pdf-url") || "";
-
-    if (
-      !key ||
-      !pdfUrl ||
-      this.renderedPdfKeys[key] ||
-      this.renderingPdfKeys[key]
-    ) {
-      return;
-    }
-
-    this.renderingPdfKeys[key] = true;
-
-    try {
-      const pdfjsLib = await this.loadPdfJs();
-      const loadingTask = pdfjsLib.getDocument({
-        url: pdfUrl,
-        isEvalSupported: false
-      });
-      const pdf = await loadingTask.promise;
-
-      element.innerHTML = "";
-
-      const availableWidth = Math.max(element.clientWidth, 120);
-
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-        const initialViewport = page.getViewport({ scale: 1 });
-        const scale = availableWidth / initialViewport.width;
-        const viewport = page.getViewport({ scale });
-
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d", { alpha: false });
-
-        if (!context) {
-          continue;
-        }
-
-        const deviceScale = Math.min(window.devicePixelRatio || 1, 1.5);
-
-        canvas.width = Math.floor(viewport.width * deviceScale);
-        canvas.height = Math.floor(viewport.height * deviceScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
-        canvas.setAttribute("aria-label", "PDF page " + pageNumber);
-
-        context.save();
-        context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.restore();
-
-        element.appendChild(canvas);
-
-        await page.render({
-          canvasContext: context,
-          viewport,
-          transform:
-            deviceScale === 1
-              ? null
-              : [deviceScale, 0, 0, deviceScale, 0, 0],
-          background: "rgb(255,255,255)"
-        }).promise;
-
-        page.cleanup();
-      }
-
-      this.renderedPdfKeys[key] = true;
-    } catch (error) {
-      console.error("Unable to render PDF preview", error);
-      element.innerHTML =
-        '<div class="pdf-error">Unable to display PDF preview</div>';
-    } finally {
-      delete this.renderingPdfKeys[key];
-    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(viewerUrl);
   }
 
   trackByImage(index: number, img: any): any {
