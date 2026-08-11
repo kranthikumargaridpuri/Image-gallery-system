@@ -34,7 +34,6 @@ export class GalleryComponent
   private pdfScriptPromise: Promise<any> | null = null;
   private renderedPdfKeys: { [key: string]: boolean } = {};
   private renderingPdfKeys: { [key: string]: boolean } = {};
-  private pdfObserver: IntersectionObserver | null = null;
 
   constructor(
     public api: ApiService,
@@ -69,10 +68,6 @@ export class GalleryComponent
       clearInterval(this.clockInterval);
     }
 
-    if (this.pdfObserver) {
-      this.pdfObserver.disconnect();
-      this.pdfObserver = null;
-    }
   }
 
   updateDateAndTimes(): void {
@@ -217,10 +212,6 @@ export class GalleryComponent
   private resetPdfRendering(): void {
     this.renderedPdfKeys = {};
     this.renderingPdfKeys = {};
-    if (this.pdfObserver) {
-      this.pdfObserver.disconnect();
-      this.pdfObserver = null;
-    }
   }
 
   private observePdfPreviews(): void {
@@ -228,34 +219,12 @@ export class GalleryComponent
       document.querySelectorAll(".pdf-canvas-preview")
     ) as HTMLElement[];
 
-    if (!nodes.length) {
-      return;
-    }
-
-    if (!("IntersectionObserver" in window)) {
-      nodes.forEach((node) => this.renderPdfElement(node));
-      return;
-    }
-
-    if (!this.pdfObserver) {
-      this.pdfObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const element = entry.target as HTMLElement;
-              this.pdfObserver!.unobserve(element);
-              this.renderPdfElement(element);
-            }
-          });
-        },
-        { rootMargin: "500px 0px" }
-      );
-    }
-
+    // Render every PDF automatically as soon as its card exists.
+    // No IntersectionObserver, no lazy PDF loading, no click/button.
     nodes.forEach((node) => {
       const key = node.getAttribute("data-pdf-key") || "";
       if (!this.renderedPdfKeys[key] && !this.renderingPdfKeys[key]) {
-        this.pdfObserver!.observe(node);
+        this.renderPdfElement(node);
       }
     });
   }

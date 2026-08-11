@@ -99,7 +99,7 @@
               <img
                 *ngIf="!isPdf(img?.imageUrl)"
                 class="gallery-img"
-                loading="lazy"
+                loading="eager"
                 decoding="async"
                 [src]="
                   img?.imageUrl
