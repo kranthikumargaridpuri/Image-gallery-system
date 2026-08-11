@@ -1,5 +1,4 @@
 import {
-  AfterViewChecked,
   Component,
   OnDestroy,
   OnInit
@@ -14,7 +13,7 @@ declare const pdfjsLib: any;
   styleUrls: ["./gallery.component.css"]
 })
 export class GalleryComponent
-  implements OnInit, OnDestroy, AfterViewChecked {
+  implements OnInit, OnDestroy {
   images: any[] = [];
   categories: any[] = [];
   keyword = "";
@@ -34,6 +33,7 @@ export class GalleryComponent
   private pdfScriptPromise: Promise<any> | null = null;
   private renderedPdfKeys: { [key: string]: boolean } = {};
   private renderingPdfKeys: { [key: string]: boolean } = {};
+  private pdfObserver: IntersectionObserver | null = null;
 
   constructor(
     public api: ApiService,
@@ -59,15 +59,15 @@ export class GalleryComponent
     }, 1000);
   }
 
-  ngAfterViewChecked(): void {
-    this.observePdfPreviews();
-  }
-
   ngOnDestroy(): void {
     if (this.clockInterval) {
       clearInterval(this.clockInterval);
     }
 
+    if (this.pdfObserver) {
+      this.pdfObserver.disconnect();
+      this.pdfObserver = null;
+    }
   }
 
   updateDateAndTimes(): void {
@@ -118,6 +118,7 @@ export class GalleryComponent
     this.api.images().subscribe(
       (response) => {
         this.images = response || [];
+        this.schedulePdfPreviewObservation();
       },
       (error) => {
         console.error("Unable to load images", error);
@@ -137,6 +138,7 @@ export class GalleryComponent
     this.api.search(normalizedKeyword).subscribe(
       (response) => {
         this.images = response || [];
+        this.schedulePdfPreviewObservation();
       },
       (error) => {
         console.error("Unable to search images", error);
@@ -154,6 +156,7 @@ export class GalleryComponent
     this.api.byCategory(id).subscribe(
       (response) => {
         this.images = response || [];
+        this.schedulePdfPreviewObservation();
       },
       (error) => {
         console.error("Unable to load category images", error);
@@ -212,6 +215,17 @@ export class GalleryComponent
   private resetPdfRendering(): void {
     this.renderedPdfKeys = {};
     this.renderingPdfKeys = {};
+
+    if (this.pdfObserver) {
+      this.pdfObserver.disconnect();
+      this.pdfObserver = null;
+    }
+  }
+
+  private schedulePdfPreviewObservation(): void {
+    setTimeout(() => {
+      this.observePdfPreviews();
+    }, 0);
   }
 
   private observePdfPreviews(): void {
@@ -219,13 +233,45 @@ export class GalleryComponent
       document.querySelectorAll(".pdf-canvas-preview")
     ) as HTMLElement[];
 
-    // Render every PDF automatically as soon as its card exists.
-    // No IntersectionObserver, no lazy PDF loading, no click/button.
+    if (!nodes.length) {
+      return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach((node) => this.renderPdfElement(node));
+      return;
+    }
+
+    if (!this.pdfObserver) {
+      this.pdfObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+
+            const element = entry.target as HTMLElement;
+            this.renderPdfElement(element);
+
+            if (this.pdfObserver) {
+              this.pdfObserver.unobserve(element);
+            }
+          });
+        },
+        {
+          root: null,
+          rootMargin: "250px 0px",
+          threshold: 0.01
+        }
+      );
+    }
+
     nodes.forEach((node) => {
       const key = node.getAttribute("data-pdf-key") || "";
-      if (!this.renderedPdfKeys[key] && !this.renderingPdfKeys[key]) {
-        this.renderPdfElement(node);
+      if (!key || this.renderedPdfKeys[key] || this.renderingPdfKeys[key]) {
+        return;
       }
+      this.pdfObserver!.observe(node);
     });
   }
 
@@ -278,38 +324,38 @@ export class GalleryComponent
       element.innerHTML = "";
       const availableWidth = Math.max(element.clientWidth - 4, 120);
 
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-        const baseViewport = page.getViewport({ scale: 1 });
-        const scale = availableWidth / baseViewport.width;
-        const viewport = page.getViewport({ scale: scale });
+      // Gallery cards only need a thumbnail. Rendering every page of every
+      // PDF makes the production gallery unnecessarily slow.
+      const page = await pdf.getPage(1);
+      const baseViewport = page.getViewport({ scale: 1 });
+      const scale = availableWidth / baseViewport.width;
+      const viewport = page.getViewport({ scale: scale });
 
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d", { alpha: false }) as CanvasRenderingContext2D;
-        const outputScale = Math.min(window.devicePixelRatio || 1, 1.5);
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d", { alpha: false }) as CanvasRenderingContext2D;
+      const outputScale = Math.min(window.devicePixelRatio || 1, 1.5);
 
-        canvas.width = Math.floor(viewport.width * outputScale);
-        canvas.height = Math.floor(viewport.height * outputScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
-        canvas.className = "pdf-page-canvas";
+      canvas.width = Math.floor(viewport.width * outputScale);
+      canvas.height = Math.floor(viewport.height * outputScale);
+      canvas.style.width = Math.floor(viewport.width) + "px";
+      canvas.style.height = Math.floor(viewport.height) + "px";
+      canvas.className = "pdf-page-canvas";
 
-        context.save();
-        context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.restore();
+      context.save();
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.restore();
 
-        element.appendChild(canvas);
+      element.appendChild(canvas);
 
-        await page.render({
-          canvasContext: context,
-          viewport: viewport,
-          transform: outputScale !== 1
-            ? [outputScale, 0, 0, outputScale, 0, 0]
-            : null,
-          background: "rgb(255,255,255)"
-        }).promise;
-      }
+      await page.render({
+        canvasContext: context,
+        viewport: viewport,
+        transform: outputScale !== 1
+          ? [outputScale, 0, 0, outputScale, 0, 0]
+          : null,
+        background: "rgb(255,255,255)"
+      }).promise;
 
       this.renderedPdfKeys[key] = true;
     } catch (error) {
