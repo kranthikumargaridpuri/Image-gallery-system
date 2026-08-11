@@ -84,11 +84,33 @@
         >
           <article
             class="image-card"
-            *ngFor="let img of images"
+            *ngFor="let img of images; trackBy: trackByImage"
           >
             <div class="file-preview">
+              <!--
+                Do NOT load every PDF viewer when the gallery opens.
+                Multiple browser PDF viewers are heavy and their native dark
+                canvas creates the black areas visible between PDF pages.
+                The PDF is loaded only when the user asks for it.
+              -->
+              <div
+                *ngIf="isPdf(img?.imageUrl) && !isPdfPreviewLoaded(img)"
+                class="pdf-placeholder"
+              >
+                <div class="pdf-badge">PDF</div>
+                <strong>PDF Document</strong>
+                <span>Load only when required</span>
+                <button
+                  type="button"
+                  class="load-pdf-btn"
+                  (click)="loadPdfPreview(img)"
+                >
+                  Load PDF Preview
+                </button>
+              </div>
+
               <iframe
-                *ngIf="isPdf(img?.imageUrl)"
+                *ngIf="isPdf(img?.imageUrl) && isPdfPreviewLoaded(img)"
                 class="gallery-pdf-preview"
                 [src]="safeFileUrl(img?.imageUrl)"
                 [title]="img?.name || 'PDF Preview'"
@@ -97,12 +119,15 @@
               <img
                 *ngIf="!isPdf(img?.imageUrl)"
                 class="gallery-img"
+                loading="lazy"
+                decoding="async"
                 [src]="
                   img?.imageUrl
                     ? api.imageUrl(img.imageUrl)
                     : 'assets/images/global-digipic-logo-4x6cm.jpeg'
                 "
                 [alt]="img?.name || 'Gallery Image'"
+                (error)="onImageError($event)"
               />
             </div>
 

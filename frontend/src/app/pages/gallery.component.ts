@@ -28,6 +28,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
   ksaTime = "";
 
   private clockInterval: any;
+  private loadedPdfPreviews: { [key: string]: boolean } = {};
 
   constructor(
     public api: ApiService,
@@ -181,14 +182,54 @@ export class GalleryComponent implements OnInit, OnDestroy {
     return !!fileUrl && fileUrl.toLowerCase().split("?")[0].endsWith(".pdf");
   }
 
+  private getPdfKey(img: any): string {
+    if (!img) {
+      return "";
+    }
+
+    return String(img.id || img.imageCode || img.imageUrl || "");
+  }
+
+  isPdfPreviewLoaded(img: any): boolean {
+    const key = this.getPdfKey(img);
+    return !!key && !!this.loadedPdfPreviews[key];
+  }
+
+  loadPdfPreview(img: any): void {
+    const key = this.getPdfKey(img);
+
+    if (key) {
+      this.loadedPdfPreviews[key] = true;
+    }
+  }
+
   safeFileUrl(fileUrl: string): SafeResourceUrl {
     if (!fileUrl) {
       return this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
     }
 
-    return this.sanitizer.bypassSecurityTrustResourceUrl(
-      this.api.imageUrl(fileUrl)
-    );
+    const url = this.api.imageUrl(fileUrl);
+    const viewerUrl =
+      url +
+      (url.indexOf("#") === -1 ? "#" : "&") +
+      "toolbar=0&navpanes=0&scrollbar=1&view=FitH";
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(viewerUrl);
+  }
+
+  trackByImage(index: number, img: any): any {
+    return img && (img.id || img.imageCode || img.imageUrl)
+      ? img.id || img.imageCode || img.imageUrl
+      : index;
+  }
+
+  onImageError(event: Event): void {
+    const element = event.target as HTMLImageElement;
+    const fallback = "assets/images/global-digipic-logo-4x6cm.jpeg";
+
+    if (element && element.src.indexOf("global-digipic-logo-4x6cm.jpeg") === -1) {
+      element.src = fallback;
+    }
   }
 
   viewImage(code: string): void {
