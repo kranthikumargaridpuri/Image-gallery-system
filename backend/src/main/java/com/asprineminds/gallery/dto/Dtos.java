@@ -53,7 +53,9 @@ public class Dtos {
 
 	public static class ImageResponse {
 		public Long id, categoryId;
-		public String name, description, imageUrl, categoryName;
+		public String name, description, imageUrl, thumbnailUrl, categoryName;
+		public String originalFileName, contentType;
+		public Long sizeBytes;
 		public LocalDateTime createdAt;
 		public Double cost;
 		public String imageCode;

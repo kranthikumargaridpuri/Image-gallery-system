@@ -21,6 +21,7 @@ public class GalleryImage {
     @Column(nullable = false) private String name;
     @Column(length = 2000) private String description;
     private String fileName;
+    private String originalFileName;
     private String imageUrl;
     private String contentType;
     private Long sizeBytes;
@@ -44,6 +45,8 @@ public class GalleryImage {
     public void setDescription(String description) { this.description = description; }
     public String getFileName() { return fileName; }
     public void setFileName(String fileName) { this.fileName = fileName; }
+    public String getOriginalFileName() { return originalFileName; }
+    public void setOriginalFileName(String originalFileName) { this.originalFileName = originalFileName; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public String getContentType() { return contentType; }
