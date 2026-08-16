@@ -13,16 +13,20 @@
 
   <!-- MAIN ROW -->
   <div class="row">
-    <!-- IMAGE -->
+    <!-- IMAGE / PDF THUMBNAIL -->
     <div class="col-lg-4 col-md-12 mb-3 text-center">
       <div class="card preview-card p-3 shadow">
         <img
-          *ngIf="image?.imageUrl"
-          [src]="api.imageUrl(image.imageUrl)"
+          [src]="getPreviewUrl(image)"
           [alt]="image?.name || 'Image preview'"
           class="preview-img"
           draggable="false"
+          (error)="onPreviewError($event)"
         />
+
+        <div class="mt-2 text-muted small" *ngIf="isPdf(image)">
+          PDF first-page preview
+        </div>
       </div>
     </div>
 
