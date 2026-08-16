@@ -78,7 +78,7 @@ export class AuthService {
       window.localStorage.clear();
     } catch (e) {}
 
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   forgotPassword(email: string) {

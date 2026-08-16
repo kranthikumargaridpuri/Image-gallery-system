@@ -10,40 +10,43 @@
 
     <div class="clock-strip" aria-label="International date and time">
       <div class="clock-item">
-        <strong>INDIA</strong>
-        <span>{{ india.date }}</span>
-        <span>{{ india.time }}</span>
+        <strong class="clock-country">INDIA</strong>
+        <span class="clock-date">{{ india.date }}</span>
+        <span class="clock-time">{{ india.time }}</span>
       </div>
       <div class="clock-item">
-        <strong>USA</strong>
-        <span>{{ usa.date }}</span>
-        <span>{{ usa.time }}</span>
+        <strong class="clock-country">USA</strong>
+        <span class="clock-date">{{ usa.date }}</span>
+        <span class="clock-time">{{ usa.time }}</span>
       </div>
       <div class="clock-item">
-        <strong>UK</strong>
-        <span>{{ uk.date }}</span>
-        <span>{{ uk.time }}</span>
+        <strong class="clock-country">UK</strong>
+        <span class="clock-date">{{ uk.date }}</span>
+        <span class="clock-time">{{ uk.time }}</span>
       </div>
       <div class="clock-item">
-        <strong>AUSTRALIA</strong>
-        <span>{{ australia.date }}</span>
-        <span>{{ australia.time }}</span>
+        <strong class="clock-country">AUSTRALIA</strong>
+        <span class="clock-date">{{ australia.date }}</span>
+        <span class="clock-time">{{ australia.time }}</span>
       </div>
       <div class="clock-item">
-        <strong>KSA</strong>
-        <span>{{ ksa.date }}</span>
-        <span>{{ ksa.time }}</span>
+        <strong class="clock-country">KSA</strong>
+        <span class="clock-date">{{ ksa.date }}</span>
+        <span class="clock-time">{{ ksa.time }}</span>
       </div>
     </div>
 
-    <nav class="account-menu" aria-label="Account navigation">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">GALLERY</a>
-      <a routerLink="/cart" *ngIf="auth.loggedIn()">CART</a>
-      <a routerLink="/admin" *ngIf="auth.isAdmin()">ADMIN</a>
-      <a routerLink="/login" *ngIf="!auth.loggedIn()">LOGIN</a>
-      <a routerLink="/register" *ngIf="!auth.loggedIn()">REGISTER</a>
-      <a href="#" *ngIf="auth.loggedIn()" (click)="auth.logout(); $event.preventDefault()">LOGOUT</a>
-    </nav>
+    <div class="account-cluster" aria-label="Account navigation">
+      <a class="admin-link" routerLink="/admin">ADMIN</a>
+      <div class="account-row" *ngIf="!auth.loggedIn()">
+        <a routerLink="/register">REGISTER</a>
+        <a routerLink="/login">LOGIN</a>
+      </div>
+      <div class="account-row" *ngIf="auth.loggedIn()">
+        <a routerLink="/cart">CART</a>
+        <a href="#" (click)="auth.logout(); $event.preventDefault()">LOGOUT</a>
+      </div>
+    </div>
   </header>
 
   <main class="main-body">

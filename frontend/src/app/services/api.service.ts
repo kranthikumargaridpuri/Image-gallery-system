@@ -103,6 +103,29 @@ export class ApiService {
     return this.http.post<any>(this.api + '/auth/reset-password', data);
   }
 
+  originalFileDownloadUrl(image: any): string {
+    // Prefer an explicit original-file URL if the backend already returns one.
+    const explicit =
+      image &&
+      (image.originalFileUrl ||
+        image.originalUrl ||
+        image.downloadUrl ||
+        image.fileUrl);
+
+    if (explicit) {
+      return this.imageUrl(explicit);
+    }
+
+    // Production contract: this endpoint must return the exact bytes that
+    // were originally uploaded, with Content-Type and Content-Disposition.
+    if (image && image.id != null) {
+      return this.api + '/images/' + encodeURIComponent(image.id) + '/download';
+    }
+
+    // Last-resort fallback for older backend responses.
+    return image && image.imageUrl ? this.imageUrl(image.imageUrl) : '';
+  }
+
   imageUrl(path: string) {
     if (!path) {
       return '';

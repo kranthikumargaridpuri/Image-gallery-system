@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../services/api.service';
 
@@ -14,13 +13,10 @@ export class ImagePreviewComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
-  pdfPreviewSrc: SafeResourceUrl | null = null;
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    public api: ApiService,
-    private sanitizer: DomSanitizer
+    public api: ApiService
   ) {}
 
   ngOnInit() {
@@ -35,16 +31,6 @@ export class ImagePreviewComponent implements OnInit {
     this.api.getImageByCode(id).subscribe(
       (res: any) => {
         this.image = res;
-
-        if (this.image && this.isPdf(this.image.imageUrl)) {
-          const pdfUrl = this.api.imageUrl(this.image.imageUrl) +
-            '#page=1&zoom=page-width&toolbar=1&navpanes=0';
-          this.pdfPreviewSrc =
-            this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-        } else {
-          this.pdfPreviewSrc = null;
-        }
-
         this.loading = false;
       },
       (err: any) => {
@@ -53,15 +39,6 @@ export class ImagePreviewComponent implements OnInit {
         this.loading = false;
       }
     );
-  }
-
-  isPdf(path: string): boolean {
-    if (!path) {
-      return false;
-    }
-
-    const cleanPath = path.split('?')[0].split('#')[0].toLowerCase();
-    return cleanPath.endsWith('.pdf');
   }
 
   goBack() {

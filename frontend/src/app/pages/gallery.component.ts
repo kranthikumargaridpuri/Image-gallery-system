@@ -17,6 +17,8 @@ export class GalleryComponent
   images: any[] = [];
   categories: any[] = [];
   keyword = "";
+  downloadMessage = "";
+  private downloadMessageTimer: any;
 
   indiaDate = "";
   indiaTime = "";
@@ -67,6 +69,10 @@ export class GalleryComponent
     if (this.pdfObserver) {
       this.pdfObserver.disconnect();
       this.pdfObserver = null;
+    }
+
+    if (this.downloadMessageTimer) {
+      clearTimeout(this.downloadMessageTimer);
     }
   }
 
@@ -210,6 +216,146 @@ export class GalleryComponent
       return;
     }
     window.location.href = "/image-preview/" + encodeURIComponent(code);
+  }
+
+  downloadFile(img: any): void {
+    if (!img) {
+      return;
+    }
+
+    const originalUrl = this.api.originalFileDownloadUrl(img);
+    const fallbackUrl = img.imageUrl ? this.api.imageUrl(img.imageUrl) : "";
+
+    if (!originalUrl && !fallbackUrl) {
+      this.showDownloadMessage("Unable to download file. Original file URL is missing.");
+      return;
+    }
+
+    this.fetchOriginalFile(originalUrl || fallbackUrl)
+      .catch((error) => {
+        // Compatibility fallback for an older backend that does not yet expose
+        // GET /api/images/{id}/download. This preserves the currently served file,
+        // but true original format/size requires the backend original-download endpoint.
+        if (fallbackUrl && fallbackUrl !== originalUrl) {
+          return this.fetchOriginalFile(fallbackUrl);
+        }
+        throw error;
+      })
+      .then(({ blob, response, sourceUrl }) => {
+        const fileName =
+          this.fileNameFromContentDisposition(response.headers.get("Content-Disposition")) ||
+          this.fileNameFromImageMetadata(img) ||
+          this.fileNameFromUrl(sourceUrl) ||
+          this.fileNameFromMimeType(blob.type, img);
+
+        const objectUrl = window.URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = fileName;
+        anchor.style.display = "none";
+
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+
+        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000);
+        this.showDownloadMessage("Original file downloaded. Check Downloads.");
+      })
+      .catch((error) => {
+        console.error("Unable to download original file", error);
+        this.showDownloadMessage("Unable to download original file. Please try again.");
+      });
+  }
+
+  private fetchOriginalFile(url: string): Promise<{
+    blob: Blob;
+    response: Response;
+    sourceUrl: string;
+  }> {
+    return fetch(url).then((response) => {
+      if (!response.ok) {
+        throw new Error("Download failed: HTTP " + response.status);
+      }
+
+      return response.blob().then((blob) => ({
+        blob,
+        response,
+        sourceUrl: url
+      }));
+    });
+  }
+
+  private fileNameFromContentDisposition(header: string | null): string {
+    if (!header) {
+      return "";
+    }
+
+    const utf8Match = header.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Match && utf8Match[1]) {
+      try {
+        return decodeURIComponent(utf8Match[1].replace(/["']/g, ""));
+      } catch (_) {
+        return utf8Match[1].replace(/["']/g, "");
+      }
+    }
+
+    const normalMatch = header.match(/filename="?([^";]+)"?/i);
+    return normalMatch && normalMatch[1] ? normalMatch[1].trim() : "";
+  }
+
+  private fileNameFromImageMetadata(img: any): string {
+    const value =
+      img.originalFileName ||
+      img.originalFilename ||
+      img.fileName ||
+      img.filename ||
+      "";
+
+    return value ? String(value) : "";
+  }
+
+  private fileNameFromUrl(url: string): string {
+    if (!url) {
+      return "";
+    }
+
+    try {
+      const clean = url.split("?")[0].split("#")[0];
+      const value = clean.substring(clean.lastIndexOf("/") + 1);
+      return value ? decodeURIComponent(value) : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  private fileNameFromMimeType(mimeType: string, img: any): string {
+    const mimeExtensionMap: { [key: string]: string } = {
+      "image/jpeg": ".jpg",
+      "image/png": ".png",
+      "image/webp": ".webp",
+      "image/gif": ".gif",
+      "image/bmp": ".bmp",
+      "image/tiff": ".tif",
+      "image/svg+xml": ".svg",
+      "application/pdf": ".pdf"
+    };
+
+    const extension = mimeExtensionMap[mimeType] || "";
+    const base = String(img.imageCode || img.name || "original-file")
+      .replace(/[^a-zA-Z0-9_-]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "original-file";
+
+    return base + extension;
+  }
+
+  private showDownloadMessage(message: string): void {
+    this.downloadMessage = message;
+    if (this.downloadMessageTimer) {
+      clearTimeout(this.downloadMessageTimer);
+    }
+    this.downloadMessageTimer = setTimeout(() => {
+      this.downloadMessage = "";
+    }, 3500);
   }
 
   private resetPdfRendering(): void {

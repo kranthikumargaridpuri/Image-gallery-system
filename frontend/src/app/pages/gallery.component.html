@@ -39,22 +39,6 @@
         >
           {{ c.name }}
         </button>
-
-        <button
-          type="button"
-          class="category-btn"
-          routerLink="/login"
-        >
-          Login User
-        </button>
-
-        <button
-          type="button"
-          class="category-btn"
-          routerLink="/admin"
-        >
-          Admin
-        </button>
       </div>
     </aside>
 
@@ -112,27 +96,34 @@
             </div>
 
             <div class="image-card-body">
-              <h3>
-                {{ img?.name || 'Image Name' }}
-              </h3>
+              <h3>{{ img?.name || 'Image Name' }}</h3>
 
               <p class="image-code">
                 <strong>Code:</strong>
                 {{ img?.imageCode || 'Not Generated' }}
               </p>
 
-              <p class="price-text">
-                Cost: ₹{{ img?.cost || 0 }}
-              </p>
+              <p class="price-text">Cost: ₹{{ img?.cost || 0 }}</p>
 
-              <button
-                type="button"
-                class="card-action preview-action"
-                *ngIf="img?.imageCode"
-                (click)="viewImage(img.imageCode)"
-              >
-                Preview
-              </button>
+              <div class="card-actions">
+                <button
+                  type="button"
+                  class="card-action preview-action"
+                  *ngIf="img?.imageCode"
+                  (click)="viewImage(img.imageCode)"
+                >
+                  Preview
+                </button>
+
+                <button
+                  type="button"
+                  class="card-action download-action"
+                  *ngIf="img?.imageUrl"
+                  (click)="downloadFile(img)"
+                >
+                  Download
+                </button>
+              </div>
 
               <button
                 type="button"
@@ -150,38 +141,18 @@
           class="empty-state"
           *ngIf="!images || images.length === 0"
         >
-          <div
-            class="empty-icon"
-            aria-hidden="true"
-          >
-            ▧
-          </div>
-
+          <div class="empty-icon" aria-hidden="true">▧</div>
           <h2>No designs found</h2>
-
-          <p>
-            Try another keyword or select a different category.
-          </p>
-
-          <button
-            type="button"
-            (click)="load()"
-          >
-            View All Images
-          </button>
+          <p>Try another keyword or select a different category.</p>
+          <button type="button" (click)="load()">View All Images</button>
         </div>
       </section>
     </main>
 
     <aside class="payment-column">
       <div class="payment-box">
-        <p class="pay-to">
-          Pay to
-        </p>
-
-        <h2>
-          GLOBAL TRADERS
-        </h2>
+        <p class="pay-to">Pay to</p>
+        <h2>GLOBAL TRADERS</h2>
 
         <div class="qr-box">
           <img
@@ -193,54 +164,39 @@
 
         <div class="upi-details">
           <span>UPI ID:</span>
-          <strong>
-            gdpkki.traders5696@kotak
-          </strong>
+          <strong>gdpkki.traders5696@kotak</strong>
         </div>
 
-        <p class="scan-text">
-          Scan and Pay Instantly
-        </p>
+        <p class="scan-text">Scan and Pay Instantly</p>
       </div>
     </aside>
   </div>
 
-  <div class="secure-footer">
-    <strong>
-      We are 100% Secure.
-    </strong>
-
+  <section class="secure-purchase-banner" aria-label="Purchase security information">
+    <strong>We are 100% Secure.</strong>
     <span>
       Send the item code and payment screenshot through WhatsApp.
       We will transfer the purchased file to the same WhatsApp number.
     </span>
-  </div>
+  </section>
 
-  <footer class="main-footer">
-    <div class="footer-contact">
+  <footer class="gallery-footer">
+    <div class="footer-support">
       <span>Support:</span>
-
-      <a href="mailto:admin@asprineminds.com">
-        admin@asprineminds.com
-      </a>
-
-      <span class="divider">|</span>
-
+      <strong>admin@asprineminds.com</strong>
+      <span class="footer-divider">|</span>
       <span>Cell:</span>
-
-      <a href="tel:+919281495696">
-        +91 9281495696
-      </a>
-
-      <span class="divider">|</span>
-
-      <span>
-        Andhra Pradesh, INDIA
-      </span>
+      <strong>+91 9281495696</strong>
+      <span class="footer-divider">|</span>
+      <span>Andhra Pradesh, INDIA</span>
     </div>
 
-    <div class="footer-rights">
-      © 2026 AsprineMinds . All Rights Reserved.
+    <div class="footer-copyright">
+      © 2026 AsprineMinds. All Rights Reserved.
     </div>
   </footer>
+
+  <div class="download-toast" *ngIf="downloadMessage">
+    {{ downloadMessage }}
+  </div>
 </section>
