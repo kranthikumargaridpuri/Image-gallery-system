@@ -165,3 +165,84 @@
     max-width: 260px;
   }
 }
+
+/* iPhone / mobile-only refinements. Desktop styles above remain unchanged. */
+@media (max-width: 576px) {
+  .top-action-bar {
+    gap: 10px;
+  }
+
+  .back-btn {
+    width: 100%;
+    padding: 9px 16px;
+  }
+
+  .category-top-bar {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .category-label,
+  .category-value {
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+
+  .category-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .preview-card,
+  .contact-card {
+    border-radius: 14px;
+  }
+
+  .preview-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 70vh;
+    margin-bottom: 0;
+    padding: 6px;
+    border-width: 3px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .description-bar,
+  .contact-bar {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .description-text {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .image-title {
+    font-size: 23px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .info-box {
+    padding: 13px;
+  }
+
+  .info-box p {
+    font-size: 13px;
+  }
+
+  .price-text {
+    font-size: 22px;
+  }
+
+  .qr-box {
+    max-width: 220px;
+    min-height: 0;
+  }
+}

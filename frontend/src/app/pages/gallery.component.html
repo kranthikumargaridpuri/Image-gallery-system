@@ -92,6 +92,7 @@
                 "
                 [alt]="img?.name || 'Gallery Image'"
                 (error)="onImageError($event)"
+                draggable="false"
               />
             </div>
 
@@ -119,7 +120,7 @@
                   type="button"
                   class="card-action download-action"
                   *ngIf="img?.imageUrl"
-                  (click)="downloadFile(img)"
+                  (click)="downloadFile(img, $event)"
                 >
                   Download
                 </button>

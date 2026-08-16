@@ -5,6 +5,7 @@ import {
 } from "@angular/core";
 import { ApiService } from "../services/api.service";
 import { AuthService } from "../services/auth.service";
+import { Router } from "@angular/router";
 
 declare const pdfjsLib: any;
 
@@ -39,7 +40,8 @@ export class GalleryComponent
 
   constructor(
     public api: ApiService,
-    public auth: AuthService
+    public auth: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -215,10 +217,24 @@ export class GalleryComponent
     if (!code) {
       return;
     }
-    window.location.href = "/image-preview/" + encodeURIComponent(code);
+
+    // Keep preview navigation inside Angular. This avoids a full-page browser
+    // navigation, which is more reliable on iPhone/Safari and does not invoke
+    // any download behavior.
+    this.router.navigate(["/image-preview", code]);
   }
 
-  downloadFile(img: any): void {
+  downloadFile(img: any, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // A file download must come from a real user tap/click.
+      if (event.isTrusted === false) {
+        return;
+      }
+    }
+
     if (!img) {
       return;
     }
