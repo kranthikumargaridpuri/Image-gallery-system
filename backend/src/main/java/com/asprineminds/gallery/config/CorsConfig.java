@@ -14,7 +14,9 @@ public class CorsConfig {
             "http://34.194.188.175",
             "http://34.194.188.175:80",
             "http://gallery.asprineminds.com",
-            "https://gallery.asprineminds.com"
+            "https://gallery.asprineminds.com",
+            "https://globaldigipic.com",
+            "https://www.globaldigipic.com"
     };
 
     @Bean
