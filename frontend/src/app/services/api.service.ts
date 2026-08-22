@@ -136,9 +136,9 @@ export class ApiService {
     }
 
     if (path.startsWith('/')) {
-      return this.baseUrl + path;
+      return this.baseUrl ? this.baseUrl + path : path;
     }
 
-    return this.baseUrl + '/' + path;
+    return this.baseUrl ? this.baseUrl + '/' + path : '/' + path;
   }
 }

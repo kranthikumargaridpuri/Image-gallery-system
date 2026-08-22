@@ -15,7 +15,7 @@
     <aside class="left-column">
       <div class="promo-card">
         <img
-          src="assets/images/global-digipic-logo-4x6cm.jpeg"
+          src="assets/images/global-digipic-banner.png"
           alt="Global Digipic services"
         />
       </div>
@@ -88,7 +88,7 @@
                 [src]="
                   img?.imageUrl
                     ? api.imageUrl(img.imageUrl)
-                    : 'assets/images/global-digipic-logo-4x6cm.jpeg'
+                    : 'assets/images/global-digipic-banner.png'
                 "
                 [alt]="img?.name || 'Gallery Image'"
                 (error)="onImageError($event)"
@@ -157,7 +157,7 @@
 
         <div class="qr-box">
           <img
-            src="assets/images/payment-qr.jpeg"
+            src="assets/images/payment-qr-original.jpeg"
             alt="Global Traders UPI payment QR code"
             class="payment-qr-image"
           />

@@ -3,6 +3,10 @@
     <div class="card p-4">
       <h3>Login</h3>
 
+      <div class="alert alert-warning py-2" *ngIf="infoMessage">
+        {{ infoMessage }}
+      </div>
+
       <input
         class="form-control my-2"
         type="email"

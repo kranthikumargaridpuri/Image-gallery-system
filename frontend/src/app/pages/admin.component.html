@@ -89,8 +89,22 @@
   </tr>
 
   <tr *ngFor="let i of images">
-    <td>
-      <img [src]="api.imageUrl(i.imageUrl)" width="80" />
+    <td class="admin-preview-cell">
+      <iframe
+        *ngIf="isPdf(i.imageUrl)"
+        class="admin-pdf-thumb"
+        [src]="safePdfUrl(i)"
+        title="PDF preview"
+        tabindex="-1"
+      ></iframe>
+
+      <img
+        *ngIf="!isPdf(i.imageUrl)"
+        class="admin-image-thumb"
+        [src]="api.imageUrl(i.imageUrl)"
+        [alt]="i.name || 'Uploaded image'"
+        (error)="onAdminImageError($event)"
+      />
     </td>
     <td>{{ i.name }}</td>
     <td>{{ i.imageCode }}</td>

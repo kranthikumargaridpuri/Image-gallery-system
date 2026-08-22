@@ -206,7 +206,7 @@ export class GalleryComponent
 
   onImageError(event: Event): void {
     const element = event.target as HTMLImageElement;
-    const fallback = "assets/images/global-digipic-logo-4x6cm.jpeg";
+    const fallback = "assets/images/global-digipic-banner.png";
 
     if (element && element.src.indexOf("global-digipic-logo-4x6cm.jpeg") === -1) {
       element.src = fallback;

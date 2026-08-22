@@ -73,11 +73,16 @@ export class AuthService {
     }
   }
 
-  logout() {
+  clearSession() {
     try {
-      window.localStorage.clear();
+      window.localStorage.removeItem('token');
+      window.localStorage.removeItem('role');
+      window.localStorage.removeItem('username');
     } catch (e) {}
+  }
 
+  logout() {
+    this.clearSession();
     this.router.navigate(['/']);
   }
 

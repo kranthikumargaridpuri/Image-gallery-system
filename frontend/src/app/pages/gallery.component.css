@@ -839,3 +839,75 @@
     font-size: 11px;
   }
 }
+
+/* =========================================================
+   GLOBAL DIGIPIC PROMO + PAYMENT QR FIXES
+   ========================================================= */
+
+/* Show the complete supplied Global Digipic artwork clearly in the left rail. */
+.promo-card {
+  padding: 0 4px;
+  box-sizing: border-box;
+}
+
+.promo-card img {
+  width: min(158px, 100%);
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* The supplied QR artwork contains its own heading. The page already has
+   "Pay to / GLOBAL TRADERS", so crop the artwork to the QR matrix only. */
+.qr-box {
+  position: relative;
+  width: 178px;
+  height: 178px;
+  margin: 7px auto 8px;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 7px;
+}
+
+.qr-box img.payment-qr-image {
+  position: absolute;
+  left: 50%;
+  top: -43%;
+  width: 114% !important;
+  height: auto !important;
+  max-width: none;
+  margin: 0;
+  transform: translateX(-50%);
+  object-fit: initial;
+}
+
+@media (max-width: 1100px) {
+  .promo-card img {
+    width: min(145px, 100%);
+  }
+
+  .qr-box {
+    width: 158px;
+    height: 158px;
+  }
+}
+
+@media (max-width: 900px) {
+  .qr-box {
+    width: 210px;
+    height: 210px;
+  }
+}
+
+@media (max-width: 576px) {
+  .qr-box {
+    width: min(210px, 78vw);
+    height: min(210px, 78vw);
+  }
+}

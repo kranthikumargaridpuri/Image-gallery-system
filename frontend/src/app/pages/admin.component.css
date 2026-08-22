@@ -18,3 +18,25 @@
   border-radius: 10px;
   text-align: center;
 }
+/* Manage Images: never try to render a PDF inside an <img> tag. */
+.admin-preview-cell {
+  width: 105px;
+  min-width: 105px;
+  vertical-align: middle;
+}
+
+.admin-image-thumb,
+.admin-pdf-thumb {
+  width: 86px;
+  height: 96px;
+  display: block;
+  object-fit: contain;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #dfe5ec;
+  border-radius: 5px;
+}
+
+.admin-pdf-thumb {
+  pointer-events: none;
+}
