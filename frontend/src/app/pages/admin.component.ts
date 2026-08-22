@@ -30,6 +30,12 @@ export class AdminComponent implements OnInit {
   showDeleteBox = false;
   selectedCategoryId: number = 0;
 
+  showImageDeleteBox = false;
+  selectedImageToDelete: any = null;
+  deletingImage = false;
+  deleteImageError = '';
+  deleteImageSuccess = '';
+
   private safePdfUrls: { [key: string]: SafeResourceUrl } = {};
 
   constructor(
@@ -142,8 +148,50 @@ export class AdminComponent implements OnInit {
     );
   }
 
-  del(id: number) {
-    this.api.deleteImage(id).subscribe(() => this.reload());
+  openImageDeleteBox(image: any) {
+    this.selectedImageToDelete = image;
+    this.deleteImageError = '';
+    this.deleteImageSuccess = '';
+    this.showImageDeleteBox = true;
+  }
+
+  closeImageDeleteBox() {
+    if (this.deletingImage) {
+      return;
+    }
+
+    this.showImageDeleteBox = false;
+    this.selectedImageToDelete = null;
+    this.deleteImageError = '';
+  }
+
+  confirmDeleteImage() {
+    if (!this.selectedImageToDelete || !this.selectedImageToDelete.id || this.deletingImage) {
+      return;
+    }
+
+    this.deletingImage = true;
+    this.deleteImageError = '';
+    const deletedName = this.selectedImageToDelete.name || this.selectedImageToDelete.originalFileName || 'File';
+
+    this.api.deleteImage(this.selectedImageToDelete.id).subscribe(
+      () => {
+        this.deletingImage = false;
+        this.showImageDeleteBox = false;
+        this.selectedImageToDelete = null;
+        this.deleteImageSuccess = deletedName + ' deleted permanently.';
+        this.reload();
+      },
+      (err) => {
+        this.deletingImage = false;
+        if (err && err.status === 401) {
+          return;
+        }
+        this.deleteImageError = err && err.error && err.error.message
+          ? err.error.message
+          : 'Delete failed. The file was not removed. Please try again.';
+      }
+    );
   }
 
   isPdf(fileUrl: string): boolean {

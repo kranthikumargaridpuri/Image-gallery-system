@@ -78,6 +78,10 @@
 
 <h4 class="mt-4">Manage Images</h4>
 
+<div class="alert alert-success admin-delete-success" *ngIf="deleteImageSuccess">
+  {{ deleteImageSuccess }}
+</div>
+
 <table class="table bg-white">
   <tr>
     <th>Image</th>
@@ -111,7 +115,7 @@
     <td>₹{{ i.cost }}</td>
     <td>{{ i.categoryName }}</td>
     <td>
-      <button class="btn btn-sm btn-danger" (click)="del(i.id)">Delete</button>
+      <button class="btn btn-sm btn-danger" (click)="openImageDeleteBox(i)">Delete</button>
     </td>
   </tr>
 </table>
@@ -129,5 +133,69 @@
     <button class="btn btn-danger" (click)="confirmDeleteCategory()">
       Delete
     </button>
+  </div>
+</div>
+
+<div class="gt-delete-backdrop" *ngIf="showImageDeleteBox" (click)="closeImageDeleteBox()">
+  <div class="gt-delete-modal" role="dialog" aria-modal="true" aria-labelledby="deleteImageTitle" (click)="$event.stopPropagation()">
+    <div class="gt-delete-header">
+      <div class="gt-delete-brand">
+        <img src="assets/images/logo.png" alt="Global Traders" />
+        <div>
+          <span>GLOBAL</span>
+          <strong>TRADERS</strong>
+        </div>
+      </div>
+      <button type="button" class="gt-delete-close" aria-label="Close" [disabled]="deletingImage" (click)="closeImageDeleteBox()">×</button>
+    </div>
+
+    <div class="gt-delete-body" *ngIf="selectedImageToDelete">
+      <div class="gt-delete-warning-icon">!</div>
+      <h3 id="deleteImageTitle">Delete this file permanently?</h3>
+      <p class="gt-delete-subtitle">Please verify the file before deleting. This action cannot be undone.</p>
+
+      <div class="gt-delete-file-card">
+        <div class="gt-delete-preview">
+          <iframe
+            *ngIf="isPdf(selectedImageToDelete.imageUrl)"
+            class="gt-delete-pdf-preview"
+            [src]="safePdfUrl(selectedImageToDelete)"
+            title="PDF preview"
+            tabindex="-1"
+          ></iframe>
+          <img
+            *ngIf="!isPdf(selectedImageToDelete.imageUrl)"
+            [src]="api.imageUrl(selectedImageToDelete.imageUrl)"
+            [alt]="selectedImageToDelete.name || 'File preview'"
+            (error)="onAdminImageError($event)"
+          />
+        </div>
+
+        <div class="gt-delete-file-info">
+          <span class="gt-delete-label">FILE NAME</span>
+          <strong>{{ selectedImageToDelete.originalFileName || selectedImageToDelete.name }}</strong>
+          <span class="gt-delete-display-name" *ngIf="selectedImageToDelete.originalFileName && selectedImageToDelete.name">{{ selectedImageToDelete.name }}</span>
+          <div class="gt-delete-meta">
+            <span *ngIf="selectedImageToDelete.imageCode">Code: {{ selectedImageToDelete.imageCode }}</span>
+            <span *ngIf="selectedImageToDelete.categoryName">Category: {{ selectedImageToDelete.categoryName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gt-delete-alert">
+        If you choose <strong>Yes, Delete Permanently</strong>, the uploaded file, its preview/thumbnail, cart references and database record will be removed.
+      </div>
+
+      <div class="gt-delete-error" *ngIf="deleteImageError">{{ deleteImageError }}</div>
+
+      <div class="gt-delete-actions">
+        <button type="button" class="gt-cancel-btn" [disabled]="deletingImage" (click)="closeImageDeleteBox()">
+          No, Keep File
+        </button>
+        <button type="button" class="gt-confirm-delete-btn" [disabled]="deletingImage" (click)="confirmDeleteImage()">
+          {{ deletingImage ? 'Deleting...' : 'Yes, Delete Permanently' }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>

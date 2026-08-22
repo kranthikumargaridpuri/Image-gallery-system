@@ -128,14 +128,35 @@ public class ImageService {
 
     @Transactional
     public void delete(Long id) {
-        GalleryImage img = images.findById(id).orElse(null);
-        if (img != null && img.getFileName() != null && isPdf(img.getFileName(), img.getContentType())) {
-            try {
-                Files.deleteIfExists(Paths.get(uploadDir).resolve(thumbnailFileName(img.getFileName())));
-            } catch (IOException ignored) {
-                // Database delete must still succeed even if thumbnail cleanup fails.
+        GalleryImage img = images.findById(id)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        String storedFileName = img.getFileName();
+        Path uploadRoot = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+        try {
+            if (storedFileName != null && !storedFileName.trim().isEmpty()) {
+                Path originalFile = uploadRoot.resolve(storedFileName).normalize();
+                if (!originalFile.startsWith(uploadRoot)) {
+                    throw new IOException("Invalid stored file path");
+                }
+
+                // Permanent delete means the original uploaded image/PDF is removed too.
+                Files.deleteIfExists(originalFile);
+
+                if (isPdf(storedFileName, img.getContentType())) {
+                    Path thumbnail = uploadRoot.resolve(thumbnailFileName(storedFileName)).normalize();
+                    if (!thumbnail.startsWith(uploadRoot)) {
+                        throw new IOException("Invalid thumbnail path");
+                    }
+                    Files.deleteIfExists(thumbnail);
+                }
             }
+        } catch (IOException e) {
+            // Do not silently remove only the DB row when the actual file could not be deleted.
+            throw new RuntimeException("Could not permanently delete the uploaded file", e);
         }
+
         cartItems.deleteByImageId(id);
         images.deleteById(id);
     }
