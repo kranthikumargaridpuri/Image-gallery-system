@@ -1,7 +1,15 @@
 <div class="row justify-content-center">
   <div class="col-md-5">
     <div class="card p-4">
-      <h3>Login</h3>
+      <div class="login-title-row">
+        <h3>Login</h3>
+        <a class="back-home-link" routerLink="/" aria-label="Back to Home">
+          <svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5v-9Z"></path>
+          </svg>
+          <span>Back to Home</span>
+        </a>
+      </div>
 
       <div class="alert alert-warning py-2" *ngIf="infoMessage">
         {{ infoMessage }}

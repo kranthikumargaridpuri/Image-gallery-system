@@ -40,7 +40,7 @@
   flex: 0 0 auto;
   padding: 0 13px;
   color: #fff;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   background: linear-gradient(180deg, #0b3daa, #071d73);
   border: 1px solid rgba(61, 131, 255, 0.42);
@@ -307,11 +307,15 @@
 .image-code,
 .price-text {
   margin: 3px 0;
+}
+
+.image-code {
   font-size: 10px;
 }
 
 .price-text {
   color: #087a35;
+  font-size: 10px;
   font-weight: 900;
 }
 
@@ -328,7 +332,7 @@
   margin: 0;
   padding: 0 5px;
   color: #fff;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   border: 0;
   border-radius: 5px;
