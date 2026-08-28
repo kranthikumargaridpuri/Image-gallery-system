@@ -125,7 +125,7 @@ export class GalleryComponent
 
     this.api.images().subscribe(
       (response) => {
-        this.images = response || [];
+        this.images = this.sortNewestFirst(response || []);
         this.schedulePdfPreviewObservation();
       },
       (error) => {
@@ -145,7 +145,7 @@ export class GalleryComponent
     this.resetPdfRendering();
     this.api.search(normalizedKeyword).subscribe(
       (response) => {
-        this.images = response || [];
+        this.images = this.sortNewestFirst(response || []);
         this.schedulePdfPreviewObservation();
       },
       (error) => {
@@ -163,7 +163,7 @@ export class GalleryComponent
     this.resetPdfRendering();
     this.api.byCategory(id).subscribe(
       (response) => {
-        this.images = response || [];
+        this.images = this.sortNewestFirst(response || []);
         this.schedulePdfPreviewObservation();
       },
       (error) => {
@@ -171,6 +171,26 @@ export class GalleryComponent
         this.images = [];
       }
     );
+  }
+
+  /**
+   * Always show the latest uploaded item first.
+   * Uses createdAt when available and falls back to the numeric id
+   * for older records that may not have a createdAt value.
+   */
+  private sortNewestFirst(items: any[]): any[] {
+    return (items || []).slice().sort((a: any, b: any) => {
+      const aTime =
+        a && a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime =
+        b && b.createdAt ? new Date(b.createdAt).getTime() : 0;
+
+      if (aTime !== bTime) {
+        return bTime - aTime;
+      }
+
+      return Number((b && b.id) || 0) - Number((a && a.id) || 0);
+    });
   }
 
   add(id: number): void {
