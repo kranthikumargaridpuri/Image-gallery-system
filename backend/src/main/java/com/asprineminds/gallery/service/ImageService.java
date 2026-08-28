@@ -18,6 +18,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -124,6 +128,40 @@ public class ImageService {
             out.add(map(i));
         }
         return out;
+    }
+
+    /**
+     * Admin Manage Images page.
+     *
+     * categoryId == null => ALL categories.
+     * Results are always newest first. createdAt is the primary sort and id is
+     * a deterministic fallback for rows uploaded very close together.
+     */
+    public Page<ImageResponse> adminPage(Integer page, Integer size, Long categoryId) {
+        int safePage = page == null || page < 0 ? 0 : page;
+        int safeSize = size == null ? 10 : Math.max(1, Math.min(size, 100));
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by(
+                        Sort.Order.desc("createdAt"),
+                        Sort.Order.desc("id")
+                )
+        );
+
+        Page<GalleryImage> result;
+        if (categoryId == null || categoryId <= 0) {
+            result = images.findAll(pageable);
+        } else {
+            // Validate the requested category so a bad id is not silently treated as empty.
+            if (!cats.existsById(categoryId)) {
+                throw new RuntimeException("Category not found");
+            }
+            result = images.findByCategoryId(categoryId, pageable);
+        }
+
+        return result.map(this::map);
     }
 
     @Transactional

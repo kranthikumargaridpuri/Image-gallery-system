@@ -12,7 +12,6 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -145,7 +144,6 @@ public class ImageController {
     }
 
     @PostMapping("/api/admin/images")
-    @PreAuthorize("hasRole('ADMIN')")
     public ImageResponse upload(
             @RequestParam String name,
             @RequestParam(required = false) String description,
@@ -164,7 +162,6 @@ public class ImageController {
     }
 
     @DeleteMapping("/api/admin/images/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse del(@PathVariable Long id) {
 
         service.delete(id);
