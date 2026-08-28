@@ -15,6 +15,25 @@ export class ApiService {
     return this.http.get<any[]>(this.api + '/images');
   }
 
+  /**
+   * Admin Manage Images - server-side pagination.
+   * categoryId is omitted for ALL categories.
+   */
+  adminImages(page: number, size: number, categoryId?: number | null) {
+    let url =
+      this.api +
+      '/admin/images/page?page=' +
+      encodeURIComponent(page) +
+      '&size=' +
+      encodeURIComponent(size);
+
+    if (categoryId != null && categoryId > 0) {
+      url += '&categoryId=' + encodeURIComponent(categoryId);
+    }
+
+    return this.http.get<any>(url);
+  }
+
   getImages() {
     return this.images();
   }

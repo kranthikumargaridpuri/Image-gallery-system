@@ -31,7 +31,13 @@ export class LoginComponent implements OnInit {
     this.auth.login({ email: this.email, password: this.password }).subscribe(
       (r) => {
         this.auth.save(r);
-        this.router.navigate(['/']);
+
+        // Admin goes directly to Admin Dashboard after successful login.
+        if (r && r.role === 'ROLE_ADMIN') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       () => {
         this.err = 'Invalid login';

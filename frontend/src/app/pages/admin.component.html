@@ -76,49 +76,155 @@
   </div>
 </div>
 
-<h4 class="mt-4">Manage Images</h4>
+<section class="admin-manage-images mt-4">
+  <div class="admin-images-heading">
+    <div>
+      <h4>Manage Images</h4>
+      <p>Newest uploads are shown first. Select a category to filter the list.</p>
+    </div>
 
-<div class="alert alert-success admin-delete-success" *ngIf="deleteImageSuccess">
-  {{ deleteImageSuccess }}
-</div>
+    <div class="admin-image-count" *ngIf="!loadingImages">
+      <strong>{{ totalElements }}</strong>
+      <span>{{ selectedFilterName() === 'ALL' ? 'Total Files' : selectedFilterName() + ' Files' }}</span>
+    </div>
+  </div>
 
-<table class="table bg-white">
-  <tr>
-    <th>Image</th>
-    <th>Name</th>
-    <th>Code</th>
-    <th>Cost</th>
-    <th>Category</th>
-    <th>Action</th>
-  </tr>
+  <div class="admin-category-filter">
+    <button
+      type="button"
+      class="admin-category-chip"
+      [class.active]="isImageCategorySelected(null)"
+      (click)="selectImageCategory(null)"
+    >
+      ALL
+    </button>
 
-  <tr *ngFor="let i of images">
-    <td class="admin-preview-cell">
-      <iframe
-        *ngIf="isPdf(i.imageUrl)"
-        class="admin-pdf-thumb"
-        [src]="safePdfUrl(i)"
-        title="PDF preview"
-        tabindex="-1"
-      ></iframe>
+    <button
+      type="button"
+      class="admin-category-chip"
+      *ngFor="let c of categories"
+      [class.active]="isImageCategorySelected(c.id)"
+      (click)="selectImageCategory(c.id)"
+    >
+      {{ c.name }}
+    </button>
+  </div>
 
-      <img
-        *ngIf="!isPdf(i.imageUrl)"
-        class="admin-image-thumb"
-        [src]="api.imageUrl(i.imageUrl)"
-        [alt]="i.name || 'Uploaded image'"
-        (error)="onAdminImageError($event)"
-      />
-    </td>
-    <td>{{ i.name }}</td>
-    <td>{{ i.imageCode }}</td>
-    <td>₹{{ i.cost }}</td>
-    <td>{{ i.categoryName }}</td>
-    <td>
-      <button class="btn btn-sm btn-danger" (click)="openImageDeleteBox(i)">Delete</button>
-    </td>
-  </tr>
-</table>
+  <div class="alert alert-success admin-delete-success" *ngIf="deleteImageSuccess">
+    {{ deleteImageSuccess }}
+  </div>
+
+  <div class="admin-images-state" *ngIf="loadingImages">
+    Loading images...
+  </div>
+
+  <div class="alert alert-danger" *ngIf="imageListError">
+    {{ imageListError }}
+  </div>
+
+  <div class="admin-images-table-wrap" *ngIf="!loadingImages && !imageListError">
+    <table class="table bg-white admin-images-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Cost</th>
+          <th>Category</th>
+          <th>Uploaded</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let i of images">
+          <td class="admin-preview-cell">
+            <iframe
+              *ngIf="isPdf(i.imageUrl)"
+              class="admin-pdf-thumb"
+              [src]="safePdfUrl(i)"
+              title="PDF preview"
+              tabindex="-1"
+            ></iframe>
+
+            <img
+              *ngIf="!isPdf(i.imageUrl)"
+              class="admin-image-thumb"
+              [src]="api.imageUrl(i.imageUrl)"
+              [alt]="i.name || 'Uploaded image'"
+              (error)="onAdminImageError($event)"
+            />
+          </td>
+          <td>
+            <strong>{{ i.name }}</strong>
+            <div class="admin-image-description" *ngIf="i.description">
+              {{ i.description }}
+            </div>
+          </td>
+          <td>{{ i.imageCode }}</td>
+          <td>₹{{ i.cost }}</td>
+          <td>
+            <span class="admin-table-category">{{ i.categoryName }}</span>
+          </td>
+          <td>{{ i.createdAt ? (i.createdAt | date:'dd-MM-yyyy hh:mm a') : '-' }}</td>
+          <td>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="openImageDeleteBox(i)"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="images.length === 0">
+          <td colspan="7" class="admin-no-images">
+            No files found in {{ selectedFilterName() }}.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    class="admin-pagination-bar"
+    *ngIf="!loadingImages && !imageListError && totalElements > 0"
+  >
+    <div class="admin-pagination-info">
+      Showing {{ firstVisibleItem() }} - {{ lastVisibleItem() }} of {{ totalElements }}
+    </div>
+
+    <div class="admin-pagination-controls" *ngIf="totalPages > 1">
+      <button
+        type="button"
+        class="admin-page-btn admin-page-nav"
+        [disabled]="currentPage === 0"
+        (click)="previousPage()"
+      >
+        Previous
+      </button>
+
+      <button
+        type="button"
+        class="admin-page-btn"
+        *ngFor="let page of pageNumbers()"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)"
+      >
+        {{ page + 1 }}
+      </button>
+
+      <button
+        type="button"
+        class="admin-page-btn admin-page-nav"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</section>
 
 <div class="popup-bg" *ngIf="showDeleteBox">
   <div class="popup-box">
