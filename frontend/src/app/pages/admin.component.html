@@ -1,3 +1,24 @@
+<!-- Point 6 - Contributor Design Moderation -->
+<section class="moderation-panel">
+  <div class="moderation-head">
+    <div><h3>Contributor Design Moderation</h3><p>Review contributor uploads before anything becomes public.</p></div>
+    <button type="button" class="btn btn-outline-primary" (click)="loadPendingDesigns()">Refresh</button>
+  </div>
+  <div class="alert alert-info" *ngIf="moderationMessage">{{ moderationMessage }}</div>
+  <div class="moderation-empty" *ngIf="!moderationLoading && pendingDesigns.length === 0">No designs waiting for review.</div>
+  <div class="moderation-card" *ngFor="let d of pendingDesigns">
+    <div class="moderation-meta"><strong>{{ d.title }}</strong><span>{{ d.designCode }}</span><span>Contributor #{{ d.contributorId }}</span><span>{{ d.fileFormat || 'SOURCE FILE' }}</span></div>
+    <p *ngIf="d.description">{{ d.description }}</p>
+    <div class="ownership-ok" *ngIf="d.ownershipDeclared">✓ Ownership declaration received</div>
+    <textarea class="form-control" rows="2" [(ngModel)]="moderationComments[d.id]" placeholder="Moderation comment (required for changes/reject)"></textarea>
+    <div class="moderation-actions">
+      <button type="button" class="btn btn-success" (click)="moderateDesign(d, 'APPROVE')">Approve</button>
+      <button type="button" class="btn btn-warning" (click)="moderateDesign(d, 'CHANGES_REQUIRED')">Request Changes</button>
+      <button type="button" class="btn btn-danger" (click)="moderateDesign(d, 'REJECT')">Reject</button>
+    </div>
+  </div>
+</section>
+
 <div class="admin-box">
   <h3>Admin Dashboard</h3>
 
@@ -14,9 +35,10 @@
       <hr />
 
       <h5>Manage Categories</h5>
+      <div class="text-success" *ngIf="categorySuccess">{{ categorySuccess }}</div>
 
-      <div class="text-danger" *ngIf="categoryError">
-        {{ categoryError }}
+      <div class="text-danger" *ngIf="categoryManagementError">
+        {{ categoryManagementError }}
       </div>
 
       <div
@@ -35,43 +57,26 @@
       </div>
     </div>
 
-    <div class="col-md-8">
-      <h5>Upload Image</h5>
-
-      <input class="form-control my-2" placeholder="Image name" [(ngModel)]="name" />
-      <div class="text-danger" *ngIf="nameError">{{ nameError }}</div>
-
-      <textarea class="form-control my-2" placeholder="Description" [(ngModel)]="desc"></textarea>
-      <div class="text-danger" *ngIf="descError">{{ descError }}</div>
-
-      <input
-        class="form-control my-2"
-        type="number"
-        min="0"
-        placeholder="Image Cost"
-        [(ngModel)]="cost"
-      />
-      <div class="text-danger">{{ costError }}</div>
-
-      <select class="form-control my-2" [(ngModel)]="categoryId">
-        <option value="">Select Category</option>
-        <option *ngFor="let c of categories" [value]="c.id">
-          {{ c.name }}
-        </option>
-      </select>
-
-      <div class="text-danger" *ngIf="categoryError">
-        {{ categoryError }}
+    <div class="col-md-8 smart-upload">
+      <div class="smart-title"><div><small>DIGITAL PRODUCT</small><h4>Upload New Design</h4><p>Choose the file first. Technical metadata is extracted automatically; review only what needs correction.</p></div><button type="button" class="btn btn-warning" (click)="openBulkUpload()">Bulk / ZIP Upload</button></div>
+      <input class="form-control my-2" type="file" accept="image/*,.pdf" (change)="file($event)" />
+      <div class="smart-preview" *ngIf="selected"><img *ngIf="previewUrl" [src]="previewUrl" alt="preview"><div><b>{{selected.name}}</b><span>{{fileSizeLabel}} · {{fileFormat || 'FILE'}} <span *ngIf="widthPixels">· {{widthPixels}}×{{heightPixels}} · {{orientation}}</span></span></div></div>
+      <div class="smart-grid" *ngIf="selected">
+        <label>Product title *<input class="form-control" [(ngModel)]="name"></label>
+        <label>Category *<select class="form-control" [(ngModel)]="categoryId"><option value="">Select category</option><option *ngFor="let c of categories" [value]="c.id">{{c.name}}</option></select></label>
+        <label class="wide">Description *<textarea class="form-control" rows="2" [(ngModel)]="desc"></textarea></label>
+        <label>Subcategory<input class="form-control" [(ngModel)]="subcategory"></label><label>Tags / keywords<input class="form-control" [(ngModel)]="tags"></label>
+        <label>Festival / Event<input class="form-control" [(ngModel)]="festivalEvent"></label><label>Language<input class="form-control" [(ngModel)]="language"></label>
+        <label>Orientation<input class="form-control" [(ngModel)]="orientation" readonly></label><label>Primary colour<input class="form-control" [(ngModel)]="colourMetadata"></label>
+        <label>Width (px)<input class="form-control" [(ngModel)]="widthPixels" readonly></label><label>Height (px)<input class="form-control" [(ngModel)]="heightPixels" readonly></label>
+        <label>DPI<input class="form-control" type="number" [(ngModel)]="dpi"></label><label>Format<input class="form-control" [(ngModel)]="fileFormat" readonly></label>
+        <label>Price (₹) *<input class="form-control" type="number" min="0" [(ngModel)]="cost"></label><label>Supported licenses<input class="form-control" [(ngModel)]="supportedLicenseTypes"></label>
+        <label>SEO title<input class="form-control" [(ngModel)]="seoTitle"></label><label>Public slug<input class="form-control" [(ngModel)]="publicSlug"></label>
+        <label class="wide">SEO description<textarea class="form-control" rows="2" [(ngModel)]="seoDescription"></textarea></label>
       </div>
-
-      <input class="form-control my-2" type="file" (change)="file($event)" />
-      <div class="text-danger" *ngIf="fileError">{{ fileError }}</div>
-
-      <button class="btn btn-primary mt-2" (click)="upload()">Upload</button>
-
-      <div class="text-success mt-2" *ngIf="successMessage">
-        {{ successMessage }}
-      </div>
+      <div class="text-danger" *ngIf="nameError || descError || categoryError || fileError || costError">{{nameError}} {{descError}} {{categoryError}} {{fileError}} {{costError}}</div>
+      <button *ngIf="selected" class="btn btn-primary mt-2" (click)="upload()">Upload Product</button>
+      <div class="text-success mt-2" *ngIf="successMessage">{{successMessage}}</div>
     </div>
   </div>
 </div>
@@ -232,12 +237,12 @@
 
     <p>Are you sure you want to delete this category?</p>
 
-    <button class="btn btn-secondary mr-2" (click)="closeDeleteBox()">
+    <button class="btn btn-secondary mr-2" [disabled]="deletingCategory" (click)="closeDeleteBox()">
       Cancel
     </button>
 
-    <button class="btn btn-danger" (click)="confirmDeleteCategory()">
-      Delete
+    <button class="btn btn-danger" [disabled]="deletingCategory" (click)="confirmDeleteCategory()">
+      {{ deletingCategory ? 'Deleting...' : 'Delete' }}
     </button>
   </div>
 </div>
@@ -302,6 +307,88 @@
           {{ deletingImage ? 'Deleting...' : 'Yes, Delete Permanently' }}
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Requirement 10: Bulk Upload. Each row stays bound to its File object by array position.
+     Name/description typos cannot attach another design's cost/category. -->
+<div class="bulk-overlay" *ngIf="showBulkUpload">
+  <div class="bulk-dialog">
+    <div class="bulk-head">
+      <div>
+        <h2>Bulk Upload Designs</h2>
+        <small>Same image table, same category code generation, same gallery.</small>
+      </div>
+      <button type="button" class="bulk-close" (click)="closeBulkUpload()">×</button>
+    </div>
+
+    <div class="bulk-picker">
+      <input type="file" multiple
+             accept=".jpg,.jpeg,.png,.webp,.gif,.pdf"
+             (change)="onBulkFilesSelected($event)">
+      <span *ngIf="bulkFiles.length">{{bulkFiles.length}} file(s) selected</span>
+    </div>
+
+    <div class="bulk-note">
+      Multi-file mode creates one review row per design. Set defaults once, then override only exceptions. For ZIPs, put files inside category folders (for example Art/a.jpg, Nature/b.jpg). Optional <b>catalog.csv</b> inside the ZIP can override path, price and category per file.
+    </div>
+    <div class="bulk-defaults">
+      <label>Default price ₹<input type="number" min="0" [(ngModel)]="defaultBulkPrice"></label>
+      <label>Default / fallback category<select [(ngModel)]="defaultBulkCategoryId"><option value="">Select</option><option *ngFor="let c of categories" [value]="c.id">{{c.name}}</option></select></label>
+      <button type="button" class="btn btn-outline-primary" (click)="applyDefaultBulkValues()">Apply defaults to blank rows</button>
+    </div>
+    <div class="zip-upload-box">
+      <b>ZIP batch</b><span>Mixed categories supported by folder name or catalog.csv.</span>
+      <input type="file" accept=".zip,application/zip" (change)="onZipSelected($event)">
+      <button type="button" class="btn btn-dark" [disabled]="zipUploading" (click)="uploadZip()">{{zipUploading ? 'Processing ZIP...' : 'Process & Upload ZIP'}}</button>
+    </div>
+
+    <div class="bulk-table-wrap" *ngIf="bulkRows.length">
+      <table class="bulk-table">
+        <thead>
+          <tr><th>#</th><th>File</th><th>Image Name</th><th>Description</th><th>Cost ₹</th><th>Category</th><th>Check</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of bulkRows; let i=index">
+            <td>{{i+1}}</td>
+            <td class="bulk-file">{{row.fileName}}</td>
+            <td><input [(ngModel)]="row.name" [name]="'bulkName'+i"></td>
+            <td><input [(ngModel)]="row.description" [name]="'bulkDesc'+i" placeholder="Optional"></td>
+            <td><input type="number" min="0" step="0.01" [(ngModel)]="row.cost" [name]="'bulkCost'+i" placeholder="Required"></td>
+            <td>
+              <select [(ngModel)]="row.categoryId" [name]="'bulkCat'+i">
+                <option value="">Select</option>
+                <option *ngFor="let c of categories" [value]="c.id">{{c.name}}</option>
+              </select>
+            </td>
+            <td>
+              <span class="bulk-ok" *ngIf="bulkRowValid(row)">✓ Ready</span>
+              <span class="bulk-bad" *ngIf="!bulkRowValid(row)">Cost/Category required</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bulk-error" *ngIf="bulkError">{{bulkError}}</div>
+
+    <div class="bulk-result" *ngIf="bulkResult">
+      Total {{bulkResult.total}} · Success {{bulkResult.success}} · Failed {{bulkResult.failed}}
+      <div *ngFor="let r of bulkResult.rows">
+        <span *ngIf="r.success">✓ {{r.originalFileName}} → {{r.imageCode}}</span>
+        <span *ngIf="!r.success">✗ {{r.originalFileName}} → {{r.message}}</span>
+      </div>
+    </div>
+
+    <div class="bulk-actions">
+      <span>{{bulkValidCount()}} / {{bulkRows.length}} ready</span>
+      <button type="button" class="btn btn-secondary" (click)="closeBulkUpload()" [disabled]="bulkUploading">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="startBulkUpload()"
+              [disabled]="bulkUploading || !bulkRows.length || bulkValidCount() !== bulkRows.length">
+        {{bulkUploading ? 'Uploading...' : 'Upload All'}}
+      </button>
     </div>
   </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ApiService } from '../services/api.service';
+import { EnterpriseService } from '../services/enterprise.service';
 
 @Component({
   templateUrl: './admin.component.html',
@@ -19,14 +20,38 @@ export class AdminComponent implements OnInit {
   cost = '';
   categoryId = '';
 
+  // Point 8 smart catalog metadata
+  subcategory = ''; tags = ''; festivalEvent = ''; language = ''; orientation = ''; colourMetadata = '';
+  widthPixels: any = ''; heightPixels: any = ''; dpi: any = ''; fileFormat = ''; fileSizeLabel = '';
+  supportedLicenseTypes = 'STANDARD'; seoTitle = ''; seoDescription = ''; publicSlug = ''; previewUrl = '';
+  defaultBulkPrice: any = ''; defaultBulkCategoryId = ''; zipFile: File | null = null; zipUploading = false;
+
   nameError = '';
   descError = '';
   categoryError = '';
+  categoryManagementError = '';
+  categorySuccess = '';
+  deletingCategory = false;
   fileError = '';
   costError = '';
   successMessage = '';
 
   selected: any;
+
+  // Requirement 10 - bulk upload integrated with the existing GalleryImage flow.
+  showBulkUpload = false;
+  bulkFiles: File[] = [];
+  bulkRows: any[] = [];
+  bulkUploading = false;
+  bulkError = '';
+  bulkResult: any = null;
+
+  // Point 6 - moderation queue
+  pendingDesigns: any[] = [];
+  moderationLoading = false;
+  moderationMessage = '';
+  moderationComments: any = {};
+
 
   showDeleteBox = false;
   selectedCategoryId: number = 0;
@@ -50,11 +75,51 @@ export class AdminComponent implements OnInit {
 
   constructor(
     public api: ApiService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private enterprise: EnterpriseService
   ) {}
 
   ngOnInit() {
     this.reload();
+    this.loadPendingDesigns();
+  }
+
+  loadPendingDesigns() {
+    this.moderationLoading = true;
+    this.enterprise.pendingDesigns().subscribe(
+      (rows: any[]) => { this.pendingDesigns = rows || []; this.moderationLoading = false; },
+      () => { this.pendingDesigns = []; this.moderationLoading = false; }
+    );
+  }
+
+  private currentAdminId(): number {
+    var raw = localStorage.getItem('userId') || sessionStorage.getItem('userId') || '0';
+    var id = Number(raw);
+    return isNaN(id) ? 0 : id;
+  }
+
+  moderateDesign(d: any, action: string) {
+    if (!d || !d.id) { return; }
+    var adminId = this.currentAdminId();
+    if (!adminId) { this.moderationMessage = 'Admin user id is missing. Please logout and login again.'; return; }
+    var comment = this.moderationComments[d.id] || '';
+    if ((action === 'CHANGES_REQUIRED' || action === 'REJECT') && !String(comment).trim()) {
+      this.moderationMessage = 'Enter a moderation comment before requesting changes or rejecting.'; return;
+    }
+    this.moderationMessage = '';
+    this.enterprise.moderate(Number(d.id), action, String(comment), adminId).subscribe(
+      () => { this.moderationMessage = action === 'APPROVE' ? 'Design approved. Publish it when ready.' : 'Moderation decision saved.'; this.loadPendingDesigns(); },
+      (e: any) => { this.moderationMessage = e && e.error && e.error.message ? e.error.message : 'Unable to save moderation decision.'; }
+    );
+  }
+
+  publishApprovedDesign(d: any) {
+    var adminId = this.currentAdminId();
+    if (!adminId || !d || !d.id) { return; }
+    this.enterprise.publishDesign(Number(d.id), adminId).subscribe(
+      () => { this.moderationMessage = 'Design published successfully.'; this.loadPendingDesigns(); this.loadImages(); },
+      () => { this.moderationMessage = 'Unable to publish design.'; }
+    );
   }
 
   /**
@@ -258,10 +323,10 @@ export class AdminComponent implements OnInit {
   }
 
   addCat() {
-    this.categoryError = '';
+    this.categoryManagementError = '';
 
     if (!this.catName || this.catName.trim() === '') {
-      this.categoryError = 'Category name is required';
+      this.categoryManagementError = 'Category name is required';
       return;
     }
 
@@ -274,7 +339,7 @@ export class AdminComponent implements OnInit {
           this.reload();
         },
         (err) => {
-          this.categoryError =
+          this.categoryManagementError =
             err && err.error && err.error.message
               ? err.error.message
               : 'Could not add category.';
@@ -283,9 +348,67 @@ export class AdminComponent implements OnInit {
   }
 
   file(e: any) {
-    this.selected =
-      e.target.files && e.target.files.length ? e.target.files[0] : null;
+    this.selected = e.target.files && e.target.files.length ? e.target.files[0] : null;
     this.fileError = '';
+    if (!this.selected) return;
+    this.autoFillFromFile(this.selected, null);
+  }
+
+  private autoFillFromFile(file: File, row: any): void {
+    const base = this.bulkNameFromFile(file.name);
+    const ext = (file.name.split('.').pop() || '').toUpperCase();
+    const slug = base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const target: any = row || this;
+    if (!target.name) target.name = base;
+    if (!target.desc) target.desc = 'Digital design - ' + base;
+    if (row && !row.description) row.description = 'Digital design - ' + base;
+    target.fileFormat = ext;
+    target.seoTitle = base;
+    target.seoDescription = 'Download ' + base + ' from Global DigiPic.';
+    target.publicSlug = slug;
+    if (!row) this.fileSizeLabel = this.formatBytes(file.size);
+    if (file.type && file.type.indexOf('image/') === 0) {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        target.widthPixels = img.width;
+        target.heightPixels = img.height;
+        target.orientation = img.width === img.height ? 'Square' : (img.width > img.height ? 'Landscape' : 'Portrait');
+        if (!row) { this.previewUrl = url; } else { URL.revokeObjectURL(url); }
+      };
+      img.onerror = () => URL.revokeObjectURL(url);
+      img.src = url;
+    }
+  }
+
+  private formatBytes(bytes: number): string {
+    if (!bytes) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB']; let n = bytes; let i = 0;
+    while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+    return n.toFixed(i ? 2 : 0) + ' ' + units[i];
+  }
+
+  applyDefaultBulkValues(): void {
+    this.bulkRows.forEach((r: any) => {
+      if ((r.cost === '' || r.cost === null || r.cost === undefined) && this.defaultBulkPrice !== '') r.cost = this.defaultBulkPrice;
+      if (!r.categoryId && this.defaultBulkCategoryId) r.categoryId = this.defaultBulkCategoryId;
+    });
+  }
+
+  onZipSelected(event: any): void {
+    this.zipFile = event.target.files && event.target.files.length ? event.target.files[0] : null;
+    this.bulkError = '';
+  }
+
+  uploadZip(): void {
+    if (!this.zipFile) { this.bulkError = 'Choose a ZIP file first.'; return; }
+    if (this.defaultBulkPrice === '' || Number(this.defaultBulkPrice) < 0) { this.bulkError = 'Enter a default price for ZIP files.'; return; }
+    if (!this.defaultBulkCategoryId) { this.bulkError = 'Select a fallback category for ZIP files.'; return; }
+    this.zipUploading = true; this.bulkError = ''; this.bulkResult = null;
+    this.api.bulkUploadZip(this.zipFile, Number(this.defaultBulkPrice), Number(this.defaultBulkCategoryId)).subscribe(
+      (result: any) => { this.zipUploading = false; this.bulkResult = result; this.loadImages(); },
+      (err: any) => { this.zipUploading = false; this.bulkError = err && err.error && err.error.message ? err.error.message : 'ZIP upload failed.'; }
+    );
   }
 
   upload() {
@@ -333,6 +456,11 @@ export class AdminComponent implements OnInit {
     fd.append('categoryId', this.categoryId);
     fd.append('cost', this.cost);
     fd.append('file', this.selected);
+    fd.append('subcategory', this.subcategory || ''); fd.append('tags', this.tags || ''); fd.append('festivalEvent', this.festivalEvent || '');
+    fd.append('language', this.language || ''); fd.append('orientation', this.orientation || ''); fd.append('colourMetadata', this.colourMetadata || '');
+    fd.append('widthPixels', String(this.widthPixels || '')); fd.append('heightPixels', String(this.heightPixels || '')); fd.append('dpi', String(this.dpi || ''));
+    fd.append('supportedLicenseTypes', this.supportedLicenseTypes || 'STANDARD'); fd.append('seoTitle', this.seoTitle || '');
+    fd.append('seoDescription', this.seoDescription || ''); fd.append('publicSlug', this.publicSlug || '');
 
     this.api.upload(fd).subscribe(
       () => {
@@ -443,38 +571,123 @@ export class AdminComponent implements OnInit {
   }
 
   openDeleteBox(id: number) {
+    if (this.deletingCategory) return;
+    this.categoryManagementError = '';
+    this.categorySuccess = '';
     this.selectedCategoryId = id;
     this.showDeleteBox = true;
   }
 
   closeDeleteBox() {
+    if (this.deletingCategory) return;
     this.showDeleteBox = false;
     this.selectedCategoryId = 0;
   }
 
   confirmDeleteCategory() {
-    this.categoryError = '';
-
-    this.api.deleteCategory(this.selectedCategoryId).subscribe(
+    if (this.deletingCategory || !this.selectedCategoryId) return;
+    this.categoryManagementError = '';
+    this.categorySuccess = '';
+    this.deletingCategory = true;
+    const deletedCategoryId = this.selectedCategoryId;
+    this.api.deleteCategory(deletedCategoryId).subscribe(
       () => {
-        const deletedCategoryId = this.selectedCategoryId;
+        this.deletingCategory = false;
         this.closeDeleteBox();
-
-        if (
-          this.selectedCategoryFilterId != null &&
-          Number(this.selectedCategoryFilterId) === Number(deletedCategoryId)
-        ) {
+        if (Number(this.selectedCategoryFilterId) === Number(deletedCategoryId)) {
           this.selectedCategoryFilterId = null;
           this.currentPage = 0;
         }
-
+        if (Number(this.categoryId) === Number(deletedCategoryId)) this.categoryId = '';
+        if (Number(this.defaultBulkCategoryId) === Number(deletedCategoryId)) this.defaultBulkCategoryId = '';
+        this.bulkRows.forEach((row: any) => {
+          if (Number(row.categoryId) === Number(deletedCategoryId)) row.categoryId = '';
+        });
+        this.categorySuccess = 'Category deleted successfully.';
         this.reload();
       },
-      (error) => {
-        console.log(error);
+      (error: any) => {
+        this.deletingCategory = false;
         this.closeDeleteBox();
-        this.categoryError = 'Cannot delete category.';
+        this.categoryManagementError = error && error.error && error.error.message
+          ? error.error.message : 'Could not delete category. Please try again.';
       }
     );
   }
+
+  openBulkUpload() {
+    this.showBulkUpload = true;
+    this.bulkError = '';
+    this.bulkResult = null;
+  }
+
+  closeBulkUpload() {
+    if (this.bulkUploading) return;
+    this.showBulkUpload = false;
+  }
+
+  onBulkFilesSelected(event: any) {
+    const files: File[] = Array.from((event.target && event.target.files) || []);
+    this.bulkFiles = files;
+    this.bulkRows = files.map((file: File) => ({
+      fileName: file.name,
+      name: this.bulkNameFromFile(file.name),
+      description: '',
+      cost: '',
+      categoryId: '', fileFormat: '', widthPixels: '', heightPixels: '', orientation: '', tags: '', seoTitle: '', publicSlug: ''
+    }));
+    this.bulkRows.forEach((row: any, i: number) => this.autoFillFromFile(files[i], row));
+    this.bulkResult = null;
+    this.bulkError = '';
+  }
+
+  private bulkNameFromFile(fileName: string): string {
+    return (fileName || '')
+      .replace(/\.[^/.]+$/, '')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  bulkRowValid(row: any): boolean {
+    return !!row &&
+      row.cost !== '' && row.cost !== null &&
+      !isNaN(Number(row.cost)) && Number(row.cost) >= 0 &&
+      !!row.categoryId;
+  }
+
+  bulkValidCount(): number {
+    return this.bulkRows.filter(r => this.bulkRowValid(r)).length;
+  }
+
+  startBulkUpload() {
+    this.bulkError = '';
+    this.bulkResult = null;
+
+    if (!this.bulkFiles.length) {
+      this.bulkError = 'Select files first.';
+      return;
+    }
+    if (this.bulkValidCount() !== this.bulkRows.length) {
+      this.bulkError = 'Enter a valid cost and category for every design.';
+      return;
+    }
+
+    this.bulkUploading = true;
+    this.api.bulkUploadImages(this.bulkFiles, this.bulkRows).subscribe(
+      (result: any) => {
+        this.bulkUploading = false;
+        this.bulkResult = result;
+        this.loadImages();
+      },
+      (err: any) => {
+        this.bulkUploading = false;
+        this.bulkError = err && err.error && err.error.message
+          ? err.error.message
+          : 'Bulk upload failed.';
+      }
+    );
+  }
+
 }
