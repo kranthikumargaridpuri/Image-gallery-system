@@ -68,13 +68,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .authorizeRequests()
             .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .antMatchers(HttpMethod.DELETE, "/api/categories/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
             .antMatchers(
                 "/api/auth/**",
                 "/api/images/**",
                 "/api/categories/**",
                 "/uploads/**"
             ).permitAll()
-            .antMatchers("/api/admin/**").hasRole("ADMIN")
+            .antMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/governance/copyright").authenticated()
+            .antMatchers("/api/account/**").authenticated()
+            .antMatchers(HttpMethod.GET, "/api/enterprise/plans", "/api/enterprise/designs", "/api/enterprise/ai/recommendations").permitAll()
+            .antMatchers("/api/enterprise/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+            .antMatchers("/api/enterprise/**", "/api/discovery/**").authenticated()
             .anyRequest().permitAll();
 
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

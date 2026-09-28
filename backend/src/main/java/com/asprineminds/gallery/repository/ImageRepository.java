@@ -21,10 +21,14 @@ public interface ImageRepository extends JpaRepository<GalleryImage, Long> {
     // Existing public gallery method - kept so nothing else breaks.
     List<GalleryImage> findByCategoryId(Long categoryId);
 
+    boolean existsByCategoryId(Long categoryId);
+
     // Admin Manage Images: server-side pagination for one selected category.
     Page<GalleryImage> findByCategoryId(Long categoryId, Pageable pageable);
 
     Optional<GalleryImage> findByImageCode(String imageCode);
 
     boolean existsByImageCode(String imageCode);
+    boolean existsByPublicSlug(String publicSlug);
+    Optional<GalleryImage> findByPublicSlug(String publicSlug);
 }
