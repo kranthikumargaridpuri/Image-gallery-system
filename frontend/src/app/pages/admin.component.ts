@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ApiService } from '../services/api.service';
-import { EnterpriseService } from '../services/enterprise.service';
+
 
 @Component({
   templateUrl: './admin.component.html',
