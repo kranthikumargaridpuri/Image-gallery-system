@@ -5,13 +5,19 @@ import com.asprineminds.gallery.dto.Dtos.CategoryResponse;
 import com.asprineminds.gallery.entity.Category;
 import com.asprineminds.gallery.repository.CategoryRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
-import com.asprineminds.gallery.repository.ImageRepository;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
-import java.util.Collections;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import com.asprineminds.gallery.repository.ImageRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,23 +31,40 @@ public class CategoryController {
         this.images = images;
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        if (!repo.existsById(id)) {
-            return ResponseEntity.status(404).body(Collections.singletonMap("message", "Category not found."));
+    @DeleteMapping(value = "/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> delete(@PathVariable("id") Long id, Authentication authentication) {
+        // Explicit check: this application's category routes are public and
+        // method-security annotations are not enabled in the supplied source.
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login again.");
         }
-        if (images.existsByCategoryId(id)) {
-            return ResponseEntity.status(409).body(Collections.singletonMap("message",
-                    "This category contains images. Move or delete those images before deleting the category."));
+        boolean admin = false;
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if ("ROLE_ADMIN".equals(authority.getAuthority())
+                    || "ROLE_SUPER_ADMIN".equals(authority.getAuthority())) {
+                admin = true;
+                break;
+            }
+        }
+        if (!admin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only administrators can delete categories.");
+        }
+        Optional<Category> category = repo.findById(id);
+        if (!category.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found. Refresh the category list.");
+        }
+        if (images.findByCategoryId(id, PageRequest.of(0, 1)).hasContent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("This category contains images. Move or delete those images before deleting the category.");
         }
         try {
-            // Repository deletion commits before returning; the database foreign key
-            // also protects images added concurrently after the check above.
-            repo.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(409).body(Collections.singletonMap("message",
-                    "This category is still in use. Remove its references before deleting it."));
+            // Repository deletion commits before returning; FK conflicts are
+            // caught here, including references added after the check above.
+            repo.delete(category.get());
+        } catch (DataIntegrityViolationException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("This category is still in use. Remove its references before deleting it.");
         }
         return ResponseEntity.noContent().build();
     }
