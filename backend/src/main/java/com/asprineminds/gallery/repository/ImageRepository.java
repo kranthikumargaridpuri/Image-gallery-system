@@ -29,6 +29,4 @@ public interface ImageRepository extends JpaRepository<GalleryImage, Long> {
     Optional<GalleryImage> findByImageCode(String imageCode);
 
     boolean existsByImageCode(String imageCode);
-    boolean existsByPublicSlug(String publicSlug);
-    Optional<GalleryImage> findByPublicSlug(String publicSlug);
 }
